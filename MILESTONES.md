@@ -11,7 +11,7 @@
 | # | Milestone | Status | Work Packages | Focus |
 |---|-----------|--------|---------------|-------|
 | MS-1 | Project Foundation & Transport Layer | [x] Complete | WP 1.1, WP 1.2 | Library abstraction, config node UI |
-| MS-2 | State Machine & Connection Management | [ ] Open | WP 1.3, WP 1.4 | XState FSM, connection pool, semaphore |
+| MS-2 | State Machine & Connection Management | [x] Complete | WP 1.3, WP 1.4 | XState FSM, connection pool, semaphore |
 | MS-3 | Client/Master – Read Nodes | [ ] Open | WP 2.1, WP 2.4 | FC 01-04, payload parsing, endianness |
 | MS-4 | Client/Master – Write Nodes & Queue | [ ] Open | WP 2.2, WP 2.3 | FC 05/06/15/16, backpressure |
 | MS-5 | Server/Slave – Proxy Architecture | [ ] Open | WP 3.1, WP 3.2, WP 3.3 | TCP/RTU listener, Modbus-In/Out nodes |
@@ -58,14 +58,14 @@
 - **WP 1.4** – Connection pool (TCP) and semaphore (RTU)
 
 **Deliverables:**
-- [ ] `src/lib/state-machine/connection-machine.js` – XState v5 state machine
-- [ ] `src/lib/state-machine/guards.js` – XState guards (isConnected, isQueueFull, etc.)
-- [ ] `src/lib/state-machine/actions.js` – XState actions (connect, disconnect, enqueue, etc.)
-- [ ] `src/lib/queue/connection-pool.js` – TCP connection pool
-- [ ] `src/lib/queue/rtu-semaphore.js` – RTU semaphore/mutex for serial serialization
-- [ ] `test/unit/state-machine/connection-machine.test.js` – Deterministic FSM testing
-- [ ] `test/unit/queue/connection-pool.test.js`
-- [ ] `test/unit/queue/rtu-semaphore.test.js`
+- [x] `src/lib/state-machine/connection-machine.js` – XState v5 state machine
+- [x] `src/lib/state-machine/guards.js` – XState guards (isConnected, isQueueFull, etc.)
+- [x] `src/lib/state-machine/actions.js` – XState actions (connect, disconnect, enqueue, etc.)
+- [x] `src/lib/queue/connection-pool.js` – TCP connection pool
+- [x] `src/lib/queue/rtu-semaphore.js` – RTU semaphore/mutex for serial serialization
+- [x] `test/unit/state-machine/connection-machine.test.js` – Deterministic FSM testing
+- [x] `test/unit/queue/connection-pool.test.js`
+- [x] `test/unit/queue/rtu-semaphore.test.js`
 
 **Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §6 State Machine](docs/THEORETICAL_FOUNDATIONS.md#6-deterministic-state-management-via-xstate)
 
@@ -240,7 +240,7 @@
 | Date | Milestone | Status | Notes |
 |------|-----------|--------|-------|
 | 2026-04-16 | MS-1 | Complete | Transport layer, config node, unit tests (82 passing) |
-| _TBD_ | MS-2 | Open | — |
+| 2026-04-16 | MS-2 | Complete | XState state machine, connection pool, RTU semaphore (170 passing) |
 | _TBD_ | MS-3 | Open | — |
 | _TBD_ | MS-4 | Open | — |
 | _TBD_ | MS-5 | Open | — |

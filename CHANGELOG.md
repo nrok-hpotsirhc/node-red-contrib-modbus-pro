@@ -10,6 +10,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **MS-2: State Machine & Connection Management**
+  - `src/lib/state-machine/connection-machine.js` – XState v5 state machine with 8 states (DISCONNECTED, CONNECTING, CONNECTED, READING, WRITING, ERROR, BACKOFF, RECONNECTING)
+  - `src/lib/state-machine/guards.js` – XState guards (isConnected, hasRetriesLeft, isQueueNotFull, isValidRequest)
+  - `src/lib/state-machine/actions.js` – XState actions (incrementRetry, resetRetry, storeError, enqueueRequest, dequeueRequest, calculateBackoff, storeTransport)
+  - `src/lib/queue/connection-pool.js` – TCP connection pool with round-robin multiplexing, configurable pool size, replace/drain lifecycle
+  - `src/lib/queue/rtu-semaphore.js` – RTU semaphore for half-duplex serial bus arbitration with inter-frame delay and timeout handling
+  - `test/unit/state-machine/connection-machine.test.js` – 40 deterministic FSM tests covering all state transitions
+  - `test/unit/queue/connection-pool.test.js` – 26 unit tests for TCP connection pool
+  - `test/unit/queue/rtu-semaphore.test.js` – 22 unit tests for RTU semaphore
+
 - **MS-1: Project Foundation & Transport Layer**
   - `src/lib/transport/tcp-transport.js` – TCP socket abstraction over modbus-serial (EventEmitter, FC 01-06/15/16)
   - `src/lib/transport/rtu-transport.js` – RTU serial abstraction with graceful fallback when serialport is not installed
