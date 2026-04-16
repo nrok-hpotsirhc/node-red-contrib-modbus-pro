@@ -10,6 +10,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- **MS-4: Client/Master – Write Nodes & Queue**
+  - `src/nodes/client/modbus-write.js` – Modbus Write node supporting FC 05 (Write Single Coil), FC 06 (Write Single Register), FC 15 (Write Multiple Coils), FC 16 (Write Multiple Registers) with input validation, value normalization, and standardized output payload
+  - `src/nodes/client/modbus-write.html` – Write node editor UI with function code selection, address, address offset toggle, queue size, drop strategy, dynamic value hint, and help sidebar
+  - `src/lib/queue/backpressure-queue.js` – Configurable backpressure queue with hard limit (1–10000), FIFO drop (oldest removed) and LIFO drop (newest rejected) strategies, high/low water mark events, queue statistics, constant memory footprint under flooding
+  - `test/unit/queue/backpressure-queue.test.js` – 46 unit tests for backpressure queue (constructor validation, FIFO/LIFO drop, events, memory consistency, edge cases)
+  - `test/integration/modbus-write.test.js` – 24 integration tests with node-red-node-test-helper (FC 05/06/15/16, address offset, topic handling, validation errors, queue behavior, cleanup)
+  - Registered `modbus-write` node in package.json `node-red.nodes`
+
+### Added
 - **MS-3: Client/Master – Read Nodes**
   - `src/nodes/client/modbus-read.js` – Modbus Read node supporting FC 01–04 via dropdown selection
   - `src/nodes/client/modbus-read.html` – Read node editor UI with function code selection, address, quantity, zero-based/one-based address offset toggle, polling interval, address hint display, and help sidebar

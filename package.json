@@ -25,7 +25,9 @@
   "node-red": {
     "version": ">=3.0.0",
     "nodes": {
-      "modbus-client-config": "src/nodes/config/modbus-client-config.js"
+      "modbus-client-config": "src/nodes/config/modbus-client-config.js",
+      "modbus-read": "src/nodes/client/modbus-read.js",
+      "modbus-write": "src/nodes/client/modbus-write.js"
     }
   },
   "engines": {

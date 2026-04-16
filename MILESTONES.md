@@ -13,7 +13,7 @@
 | MS-1 | Project Foundation & Transport Layer | [x] Complete | WP 1.1, WP 1.2 | Library abstraction, config node UI |
 | MS-2 | State Machine & Connection Management | [x] Complete | WP 1.3, WP 1.4 | XState FSM, connection pool, semaphore |
 | MS-3 | Client/Master – Read Nodes | [x] Complete | WP 2.1, WP 2.4 | FC 01-04, payload parsing, endianness |
-| MS-4 | Client/Master – Write Nodes & Queue | [ ] Open | WP 2.2, WP 2.3 | FC 05/06/15/16, backpressure |
+| MS-4 | Client/Master – Write Nodes & Queue | [x] Complete | WP 2.2, WP 2.3 | FC 05/06/15/16, backpressure |
 | MS-5 | Server/Slave – Proxy Architecture | [ ] Open | WP 3.1, WP 3.2, WP 3.3 | TCP/RTU listener, Modbus-In/Out nodes |
 | MS-6 | Server Caching & Optimization | [ ] Open | WP 3.4 | In-memory hashmap, performance |
 | MS-7 | Modbus/TCP Security | [ ] Open | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
@@ -115,11 +115,11 @@
 - **WP 2.3** – Backpressure logic with max queue size and FIFO/LIFO drop
 
 **Deliverables:**
-- [ ] `src/nodes/client/modbus-write.js` – Write node (single + multiple)
-- [ ] `src/nodes/client/modbus-write.html` – Write node UI
-- [ ] `src/lib/queue/backpressure-queue.js` – Queue with configurable limit
-- [ ] `test/unit/queue/backpressure-queue.test.js` – Tests for FIFO/LIFO drop, overflow
-- [ ] `test/integration/modbus-write.test.js`
+- [x] `src/nodes/client/modbus-write.js` – Write node (single + multiple)
+- [x] `src/nodes/client/modbus-write.html` – Write node UI
+- [x] `src/lib/queue/backpressure-queue.js` – Queue with configurable limit
+- [x] `test/unit/queue/backpressure-queue.test.js` – Tests for FIFO/LIFO drop, overflow
+- [x] `test/integration/modbus-write.test.js`
 
 **Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §7 Backpressure](docs/THEORETICAL_FOUNDATIONS.md#7-backpressure-management)
 
@@ -242,7 +242,7 @@
 | 2026-04-16 | MS-1 | Complete | Transport layer, config node, unit tests (82 passing) |
 | 2026-04-16 | MS-2 | Complete | XState state machine, connection pool, RTU semaphore (170 passing) |
 | 2026-04-16 | MS-3 | Complete | Read nodes, buffer parser, payload builder (264 passing) |
-| _TBD_ | MS-4 | Open | — |
+| 2026-04-16 | MS-4 | Complete | Write nodes, backpressure queue (334 passing) |
 | _TBD_ | MS-5 | Open | — |
 | _TBD_ | MS-6 | Open | — |
 | _TBD_ | MS-7 | Open | — |

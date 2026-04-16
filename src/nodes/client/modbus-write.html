@@ -1,0 +1,221 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-write', {
+        category: 'modbus',
+        color: '#E9967A',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            fc: { value: '6' },
+            address: { value: 0, validate: RED.validators.number() },
+            addressOffset: { value: 'zero-based' },
+            queueMaxSize: { value: 100, validate: RED.validators.number() },
+            queueDropStrategy: { value: 'fifo' }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'serial.svg',
+        paletteLabel: 'modbus write',
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+            var fcLabels = {
+                '5': 'FC5 Coil',
+                '6': 'FC6 Reg',
+                '15': 'FC15 Coils',
+                '16': 'FC16 Regs'
+            };
+            var fc = fcLabels[this.fc] || 'FC' + this.fc;
+            return fc + ' @' + (this.address || 0);
+        },
+        oneditprepare: function () {
+            var fcSelect = $('#node-input-fc');
+            var addressInput = $('#node-input-address');
+            var addressOffsetSelect = $('#node-input-addressOffset');
+            var addressHint = $('#modbus-write-address-hint');
+            var valueHint = $('#modbus-write-value-hint');
+
+            function updateAddressHint() {
+                var fc = parseInt(fcSelect.val(), 10);
+                var offset = addressOffsetSelect.val();
+                var addr = parseInt(addressInput.val(), 10) || 0;
+
+                var protocolAddr = (offset === 'one-based') ? Math.max(0, addr - 1) : addr;
+
+                var prefixes = { 5: '0', 6: '4', 15: '0', 16: '4' };
+                var prefix = prefixes[fc] || '';
+
+                if (offset === 'one-based') {
+                    addressHint.text('Datasheet: ' + prefix + String(addr).padStart(4, '0') + ' → Protocol: ' + protocolAddr);
+                } else {
+                    addressHint.text('Protocol address: ' + protocolAddr);
+                }
+            }
+
+            function updateValueHint() {
+                var fc = parseInt(fcSelect.val(), 10);
+                var hints = {
+                    5: 'msg.payload: boolean, 0/1, or 0xFF00/0x0000',
+                    6: 'msg.payload: integer (0–65535)',
+                    15: 'msg.payload: boolean array, e.g. [true, false, true]',
+                    16: 'msg.payload: integer array, e.g. [100, 200, 300]'
+                };
+                valueHint.text(hints[fc] || 'msg.payload: value(s) to write');
+            }
+
+            fcSelect.on('change', function () {
+                updateAddressHint();
+                updateValueHint();
+            });
+            addressInput.on('change keyup', updateAddressHint);
+            addressOffsetSelect.on('change', updateAddressHint);
+            updateAddressHint();
+            updateValueHint();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-write">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Modbus Write">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-fc"><i class="fa fa-list"></i> Function Code</label>
+        <select id="node-input-fc">
+            <option value="5">FC 05 – Write Single Coil</option>
+            <option value="6">FC 06 – Write Single Register</option>
+            <option value="15">FC 15 – Write Multiple Coils</option>
+            <option value="16">FC 16 – Write Multiple Registers</option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-address"><i class="fa fa-map-marker"></i> Start Address</label>
+        <input type="text" id="node-input-address" placeholder="0">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-addressOffset"><i class="fa fa-arrows-h"></i> Address Mode</label>
+        <select id="node-input-addressOffset">
+            <option value="zero-based">Zero-based (protocol)</option>
+            <option value="one-based">One-based (datasheet)</option>
+        </select>
+    </div>
+
+    <div class="form-row" id="modbus-write-address-hint-row">
+        <label>&nbsp;</label>
+        <span id="modbus-write-address-hint" style="color: #888; font-size: 0.9em;"></span>
+    </div>
+
+    <div class="form-row" id="modbus-write-value-hint-row">
+        <label>&nbsp;</label>
+        <span id="modbus-write-value-hint" style="color: #888; font-size: 0.9em;"></span>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-queueMaxSize"><i class="fa fa-database"></i> Queue Size</label>
+        <input type="text" id="node-input-queueMaxSize" placeholder="100">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-queueDropStrategy"><i class="fa fa-filter"></i> Drop Strategy</label>
+        <select id="node-input-queueDropStrategy">
+            <option value="fifo">FIFO – Drop oldest (sensor monitoring)</option>
+            <option value="lifo">LIFO – Drop newest (alarm events)</option>
+        </select>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-write">
+    <p>Writes data to a Modbus device using function codes FC 05, 06, 15, or 16.</p>
+
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>Server <span class="property-type">config node</span></dt>
+        <dd>Select the Modbus client configuration node that defines the connection.</dd>
+        <dt>Function Code <span class="property-type">select</span></dt>
+        <dd>
+            <ul>
+                <li><b>FC 05</b> – Write Single Coil (boolean output)</li>
+                <li><b>FC 06</b> – Write Single Register (16-bit value)</li>
+                <li><b>FC 15</b> – Write Multiple Coils (boolean array)</li>
+                <li><b>FC 16</b> – Write Multiple Registers (16-bit array)</li>
+            </ul>
+        </dd>
+        <dt>Start Address <span class="property-type">number</span></dt>
+        <dd>The starting address to write to. Interpretation depends on the Address Mode setting.</dd>
+        <dt>Address Mode <span class="property-type">select</span></dt>
+        <dd>
+            <b>Zero-based:</b> Address is used as-is (protocol level).<br>
+            <b>One-based:</b> Datasheet convention. The node automatically subtracts 1.
+        </dd>
+        <dt>Queue Size <span class="property-type">number</span></dt>
+        <dd>Maximum number of pending write requests. Default: 100. Range: 1–10000.</dd>
+        <dt>Drop Strategy <span class="property-type">select</span></dt>
+        <dd>
+            <b>FIFO:</b> Drops the oldest message when the queue is full – ideal for sensor monitoring.<br>
+            <b>LIFO:</b> Drops the newest (incoming) message when full – ideal for alarm events.
+        </dd>
+    </dl>
+
+    <h3>Input</h3>
+    <p>The value to write is taken from <code>msg.payload</code>:</p>
+    <dl class="message-properties">
+        <dt>FC 05 <span class="property-type">boolean | number</span></dt>
+        <dd><code>true</code>/<code>false</code>, <code>1</code>/<code>0</code>, or <code>0xFF00</code>/<code>0x0000</code></dd>
+        <dt>FC 06 <span class="property-type">number</span></dt>
+        <dd>Integer value 0–65535</dd>
+        <dt>FC 15 <span class="property-type">boolean[]</span></dt>
+        <dd>Array of boolean values, e.g. <code>[true, false, true]</code> (max 1968)</dd>
+        <dt>FC 16 <span class="property-type">number[]</span></dt>
+        <dd>Array of integer values (0–65535 each), e.g. <code>[100, 200, 300]</code> (max 123)</dd>
+    </dl>
+
+    <h3>Output</h3>
+    <dl class="message-properties">
+        <dt>payload <span class="property-type">object</span></dt>
+        <dd>Standardized payload object containing:</dd>
+    </dl>
+    <pre>{
+  "fc": 6,
+  "fcName": "writeSingleRegister",
+  "address": 100,
+  "quantity": 1,
+  "value": 42,
+  "unitId": 1,
+  "timestamp": "2026-04-16T10:00:00.000Z",
+  "connection": "tcp://192.168.1.100:502"
+}</pre>
+
+    <h3>Backpressure Queue</h3>
+    <p>
+        Write requests are queued to prevent flooding the Modbus bus.
+        When the queue reaches its maximum size, the configured drop strategy is applied:
+    </p>
+    <ul>
+        <li><b>FIFO:</b> The oldest pending request is discarded to make room for the new one.</li>
+        <li><b>LIFO:</b> The new (incoming) request is discarded; existing requests are preserved.</li>
+    </ul>
+    <p>
+        The node status shows the queue fill level when it exceeds 80% capacity (yellow).
+        Queue statistics (dropped count, utilization) are logged as warnings.
+    </p>
+
+    <h3>Details</h3>
+    <p>
+        The <b>modbus-write</b> node sends write commands to a Modbus device through the configured
+        client connection. It supports all four write function codes and includes a built-in
+        backpressure queue to handle burst traffic safely.
+    </p>
+    <p>
+        <b>Address Offset:</b> Modbus uses zero-based addressing at the protocol level.
+        Use "One-based" mode to enter addresses as shown in your device datasheet.
+    </p>
+</script>
