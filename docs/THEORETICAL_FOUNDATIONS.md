@@ -1,6 +1,6 @@
-# Theoretical Foundations
+﻿# Theoretical Foundations
 
-> Complete theoretical foundation for the node-red-contrib-modbus-forge project.
+> Complete theoretical foundation for the node-red-contrib-modbus-pro project.
 > Serves as a reference for developers and AI agents.
 > References: [Agents](../agents.md) | [Architecture](ARCHITECTURE.md) | [Work Packages](WORK_PACKAGES.md) | [References](REFERENCES.md)
 

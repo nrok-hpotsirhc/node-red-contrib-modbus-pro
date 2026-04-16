@@ -1,6 +1,6 @@
-# References
+﻿# References
 
-> Complete reference list for node-red-contrib-modbus-forge.
+> Complete reference list for node-red-contrib-modbus-pro.
 > All specifications, standards, libraries, and resources used in the project.
 
 ---
@@ -114,7 +114,7 @@
 ## 9. License Dependency Tree
 
 ```
-node-red-contrib-modbus-forge (BSD-3-Clause)
+node-red-contrib-modbus-pro (BSD-3-Clause)
 ├── modbus-serial@^8.0.0 (ISC)
 │   └── (transitive dependencies – see npm ls)
 ├── xstate@^5.0.0 (MIT)

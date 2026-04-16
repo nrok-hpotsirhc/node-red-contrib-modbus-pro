@@ -1,12 +1,12 @@
-{
-  "name": "node-red-contrib-modbus-forge",
+﻿{
+  "name": "node-red-contrib-modbus-pro",
   "version": "0.1.0",
   "description": "Next-generation Modbus TCP/RTU integration for Node-RED with XState-powered state management, connection pooling, backpressure control, and Modbus/TCP Security (TLS) support.",
   "license": "BSD-3-Clause",
   "author": "[HIER AUTOR EINTRAGEN]",
   "repository": {
     "type": "git",
-    "url": "https://github.com/[HIER-OWNER]/node-red-contrib-modbus-forge.git"
+    "url": "https://github.com/[HIER-OWNER]/node-red-contrib-modbus-pro.git"
   },
   "keywords": [
     "node-red",

@@ -1,6 +1,6 @@
-# Legal Analysis
+﻿# Legal Analysis
 
-> License compatibility, plagiarism check, and risk assessment for node-red-contrib-modbus-forge.
+> License compatibility, plagiarism check, and risk assessment for node-red-contrib-modbus-pro.
 > References: [Agents](../agents.md) | [References](REFERENCES.md)
 
 ---
@@ -146,7 +146,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | License incompatibility of future deps | Low | Medium | Check every new dep before adding |
 | Plagiarism claim by BiancoRoyal | Very Low | High | Architecture documentation, Git history |
 | Patent claim (Modbus protocol) | Very Low | Medium | Modbus is open since 2004 |
-| Name conflict | Very Low | Low | "forge" suffix is unique |
+| Name conflict | Very Low | Low | "pro" suffix is unique |
 | serialport native build issues | Medium | Low | Mark as optional dependency |
 
 ### Recommendations

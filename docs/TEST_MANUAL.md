@@ -1,6 +1,6 @@
-# Test Manual
+﻿# Test Manual
 
-> Test strategy, test catalog, and mock data policy for node-red-contrib-modbus-forge.
+> Test strategy, test catalog, and mock data policy for node-red-contrib-modbus-pro.
 > References: [Agents](../agents.md) | [Work Packages](WORK_PACKAGES.md) | [Architecture](ARCHITECTURE.md)
 
 ---

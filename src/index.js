@@ -1,7 +1,7 @@
-'use strict';
+﻿'use strict';
 
 /**
- * node-red-contrib-modbus-forge
+ * node-red-contrib-modbus-pro
  * Einstiegspunkt für die Node-RED Node-Registrierung.
  *
  * Dieser Index wird von Node-RED beim Laden des Pakets aufgerufen.

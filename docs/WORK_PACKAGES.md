@@ -1,6 +1,6 @@
-# Work Packages (Work Breakdown Structure)
+﻿# Work Packages (Work Breakdown Structure)
 
-> Detailed description of all work packages for node-red-contrib-modbus-forge.
+> Detailed description of all work packages for node-red-contrib-modbus-pro.
 > Milestone grouping: see [MILESTONES.md](../MILESTONES.md)
 > Theoretical foundations: see [THEORETICAL_FOUNDATIONS.md](THEORETICAL_FOUNDATIONS.md)
 > Agent guide: see [agents.md](../agents.md)

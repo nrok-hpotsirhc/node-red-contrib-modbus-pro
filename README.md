@@ -1,4 +1,4 @@
-# node-red-contrib-modbus-forge
+﻿# node-red-contrib-modbus-pro
 
 > Next-Generation Modbus TCP/RTU Integration for Node-RED
 
@@ -32,7 +32,7 @@
 
 ## Overview
 
-**node-red-contrib-modbus-forge** is a ground-up Modbus integration package for Node-RED that systematically addresses the architectural weaknesses of existing legacy implementations. It provides:
+**node-red-contrib-modbus-pro** is a ground-up Modbus integration package for Node-RED that systematically addresses the architectural weaknesses of existing legacy implementations. It provides:
 
 - **Deterministic State Management** via [XState](https://xstate.js.org/) – eliminates race conditions and undefined states
 - **Centralized Connection Pooling** – TCP multiplexing and RTU semaphore serialization
@@ -60,13 +60,13 @@ This project is based on a comprehensive requirements analysis, documented in:
 ## Installation
 
 ```bash
-npm install node-red-contrib-modbus-forge
+npm install node-red-contrib-modbus-pro
 ```
 
 For serial RTU support:
 
 ```bash
-npm install node-red-contrib-modbus-forge serialport
+npm install node-red-contrib-modbus-pro serialport
 ```
 
 ## Quick Start
@@ -100,7 +100,7 @@ npm install node-red-contrib-modbus-forge serialport
 ## Project Structure
 
 ```
-node-red-contrib-modbus-forge/
+node-red-contrib-modbus-pro/
 ├── src/
 │   ├── nodes/          # Node-RED nodes (HTML + JS)
 │   │   ├── config/     # Configuration nodes (TCP/RTU/Security)

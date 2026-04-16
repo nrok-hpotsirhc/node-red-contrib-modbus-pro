@@ -1,4 +1,4 @@
-# Milestones – node-red-contrib-modbus-forge
+﻿# Milestones – node-red-contrib-modbus-pro
 
 > Each milestone is designed as a self-contained agent session.
 > This document serves as a running guide: completed milestones are marked accordingly.

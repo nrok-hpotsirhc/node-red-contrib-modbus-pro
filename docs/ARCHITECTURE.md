@@ -1,6 +1,6 @@
-# Architecture Documentation
+﻿# Architecture Documentation
 
-> Target architecture for node-red-contrib-modbus-forge.
+> Target architecture for node-red-contrib-modbus-pro.
 > References: [Theoretical Foundations](THEORETICAL_FOUNDATIONS.md) | [Work Packages](WORK_PACKAGES.md) | [Agents](../agents.md)
 
 ---

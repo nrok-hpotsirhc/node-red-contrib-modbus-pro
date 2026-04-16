@@ -1,6 +1,6 @@
-# Developer Guide
+﻿# Developer Guide
 
-> Guide for developers working on, testing, or using node-red-contrib-modbus-forge.
+> Guide for developers working on, testing, or using node-red-contrib-modbus-pro.
 > References: [Agents](../agents.md) | [Architecture](ARCHITECTURE.md) | [Test Manual](TEST_MANUAL.md)
 
 ---
@@ -18,8 +18,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/[OWNER]/node-red-contrib-modbus-forge.git
-cd node-red-contrib-modbus-forge
+git clone https://github.com/[OWNER]/node-red-contrib-modbus-pro.git
+cd node-red-contrib-modbus-pro
 
 # Install dependencies
 npm install
@@ -39,7 +39,7 @@ npm link
 
 # In the Node-RED user directory (~/.node-red):
 cd ~/.node-red
-npm link node-red-contrib-modbus-forge
+npm link node-red-contrib-modbus-pro
 
 # Start Node-RED
 node-red
@@ -52,7 +52,7 @@ node-red
 ## 2. Project Structure
 
 ```
-node-red-contrib-modbus-forge/
+node-red-contrib-modbus-pro/
 ├── src/                    # Source code
 │   ├── nodes/              # Node-RED nodes (pairs: .js + .html)
 │   │   ├── config/         # Configuration nodes (singleton)
@@ -264,16 +264,16 @@ Examples:
 
 ```bash
 # All Modbus debug output
-DEBUG=modbusForge* node-red -v
+DEBUG=modbusPro* node-red -v
 
 # Transport layer only
-DEBUG=modbusForge:transport* node-red -v
+DEBUG=modbusPro:transport* node-red -v
 
 # State machine only
-DEBUG=modbusForge:state* node-red -v
+DEBUG=modbusPro:state* node-red -v
 
 # Also modbus-serial debug
-DEBUG=modbusForge*,modbus-serial node-red -v
+DEBUG=modbusPro*,modbus-serial node-red -v
 ```
 
 ### Common Issues

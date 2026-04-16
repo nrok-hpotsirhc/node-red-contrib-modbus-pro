@@ -1,4 +1,4 @@
-# Agent Guide – node-red-contrib-modbus-forge
+﻿# Agent Guide – node-red-contrib-modbus-pro
 
 > This document serves as the primary guide for AI agents (e.g. GitHub Copilot, Cursor)
 > working on this project. It defines context, rules, references, and session planning.
@@ -15,7 +15,7 @@
 
 ## 1. Project Overview
 
-**Name:** `node-red-contrib-modbus-forge`  
+**Name:** `node-red-contrib-modbus-pro`  
 **License:** BSD-3-Clause  
 **Goal:** Development of an industrial-grade Modbus TCP/RTU integration package for Node-RED that eliminates the architectural weaknesses of the dominant legacy package `node-red-contrib-modbus` (BiancoRoyal) through modern software engineering principles.
 
@@ -55,7 +55,7 @@
 ## 3. Project Structure
 
 ```
-node-red-contrib-modbus-forge/
+node-red-contrib-modbus-pro/
 ├── src/
 │   ├── nodes/
 │   │   ├── config/          # Modbus-Client-Config, Modbus-Server-Config
