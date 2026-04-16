@@ -13,7 +13,8 @@ test/mocks/
 ## Catalog
 | File | Simulates | Used In | Last Updated | Removable? | Dependencies |
 |------|----------|---------|-------------|------------|-------------|
-| _empty_ | Will be created in MS-1 (WP 1.1) | — | — | — | — |
+| `mock-tcp-socket.js` | `net.Socket` for TCP transport | `test/unit/transport/tcp-transport.test.js` | 2026-04-16 | no – required for TCP transport unit tests | none |
+| `mock-serial-port.js` | `serialport` module for RTU transport | `test/unit/transport/rtu-transport.test.js` | 2026-04-16 | no – required for RTU transport unit tests | none |
 ---
 ## Guidelines
 ### Mandatory Header
