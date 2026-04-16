@@ -155,6 +155,12 @@ const connectionMachine = setup({
       }
     },
 
+    // Note: reading and writing states share identical transition logic.
+    // When a queued request is dequeued, the machine transitions to 'reading'
+    // regardless of the original request type. This is intentional — the actual
+    // read/write dispatch is handled by the consumer, not the FSM. The state
+    // name indicates "bus busy processing a request".
+
     reading: {
       on: {
         SUCCESS: [

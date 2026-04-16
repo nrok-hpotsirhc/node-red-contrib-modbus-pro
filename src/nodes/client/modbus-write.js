@@ -90,6 +90,10 @@ module.exports = function (RED) {
 
     node._queue.on('drop', function (info) {
       node.warn(`Modbus Write: Queue overflow – ${info.reason} (queue: ${info.queueLength}/${node.queueMaxSize})`);
+      // Call done() on the dropped entry to release Node-RED message tracking resources
+      if (info.item && typeof info.item.done === 'function') {
+        info.item.done(new Error(`Modbus Write: message dropped (${info.reason})`));
+      }
     });
 
     node._queue.on('highWater', function (info) {
@@ -118,10 +122,10 @@ module.exports = function (RED) {
           if (typeof value === 'boolean') {
             return { value, error: null };
           }
-          if (value === 0xFF00 || value === 1 || value === true) {
+          if (value === 0xFF00 || value === 1) {
             return { value: true, error: null };
           }
-          if (value === 0x0000 || value === 0 || value === false) {
+          if (value === 0x0000 || value === 0) {
             return { value: false, error: null };
           }
           return { value: null, error: 'FC 05 requires boolean, 0/1, or 0xFF00/0x0000' };
@@ -190,13 +194,8 @@ module.exports = function (RED) {
         // Set unit ID from config node
         transport.setID(node.server.unitId);
 
-        // Execute the write
-        if (node.fc === 5 || node.fc === 6) {
-          await transport[method](node._protocolAddress, entry.value);
-        } else {
-          // FC 15 / FC 16: pass the array
-          await transport[method](node._protocolAddress, entry.value);
-        }
+        // Execute the write (all FCs take address + value/values)
+        await transport[method](node._protocolAddress, entry.value);
 
         const connectionStr = buildConnectionString(node.server.getTransportConfig());
 
@@ -248,13 +247,11 @@ module.exports = function (RED) {
         return;
       }
 
-      doWrite(entry).catch(function (err) {
+      doWrite(entry).then(function () {
+        processQueue();
+      }, function (err) {
         node.status({ fill: 'red', shape: 'ring', text: `Error: ${err.message}` });
         entry.done(err);
-        // Continue processing the queue even after an error
-        processQueue();
-      }).then(function () {
-        // Process next item if available
         processQueue();
       });
     }

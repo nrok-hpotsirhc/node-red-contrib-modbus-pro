@@ -9,6 +9,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **Code Review #3: Robustness & Correctness Improvements**
+  - Fix resource leak: FIFO drop handler in `modbus-write.js` now calls `done()` on dropped messages to release Node-RED message tracking resources
+  - Fix double `processQueue()` call on write error: replace `.catch().then()` chain with `.then(onSuccess, onError)` pattern to prevent redundant queue processing
+  - Remove dead code: unreachable `value === true` / `value === false` branches in FC 05 `validateValue()` (already handled by prior `typeof === 'boolean'` check)
+  - Simplify `doWrite()`: remove redundant `if/else` branching for FC 5/6 vs FC 15/16 – all function codes use the same `transport[method](address, value)` call
+  - Add clarifying comment in `connection-machine.js` explaining that `writing.SUCCESS` → `reading` transition is intentional (consumer-driven dispatch)
+
 ### Added
 - **MS-4: Client/Master – Write Nodes & Queue**
   - `src/nodes/client/modbus-write.js` – Modbus Write node supporting FC 05 (Write Single Coil), FC 06 (Write Single Register), FC 15 (Write Multiple Coils), FC 16 (Write Multiple Registers) with input validation, value normalization, and standardized output payload
