@@ -47,7 +47,7 @@
 | Milestones | [MILESTONES.md](MILESTONES.md) | Grouping of WPs into agent sessions, step-by-step |
 | Test Manual | [docs/TEST_MANUAL.md](docs/TEST_MANUAL.md) | Test strategy, test catalog, mock data policy |
 | Developer Guide | [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) | Setup, coding standards, contributing |
-| Legal Analysis | [docs/LEGAL_ANALYSIS.md](docs/LEGAL_ANALYSIS.md) | License compatibility, plagiarism check, differentiation |
+| Legal Analysis | [docs/LEGAL_ANALYSIS.md](docs/LEGAL_ANALYSIS.md) | License compatibility, source attribution, risk assessment |
 | References | [docs/REFERENCES.md](docs/REFERENCES.md) | All sources, specifications, links |
 
 ---

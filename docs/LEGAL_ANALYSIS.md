@@ -1,6 +1,6 @@
 ﻿# Legal Analysis
 
-> License compatibility, plagiarism check, and risk assessment for node-red-contrib-modbus-pro.
+> License compatibility, source attribution, and risk assessment for node-red-contrib-modbus-pro.
 > References: [Agents](../agents.md) | [References](REFERENCES.md)
 
 ---
@@ -12,7 +12,7 @@ This project uses the **BSD-3-Clause** license and is developed **from scratch**
 | Aspect | Assessment | Risk |
 |--------|-----------|------|
 | License compatibility | All dependencies compatible | ✅ Low |
-| Plagiarism risk | No code copied | ✅ Low |
+| Source attribution | All references verified | ✅ Low |
 | Patent risk | No known patent claims | ✅ Low |
 | Trademark risk | Own name, no name collision | ✅ Low |
 
@@ -52,45 +52,7 @@ Rule: BSD-3 can include ISC and MIT.
 
 ---
 
-## 3. Plagiarism Check
-
-### Comparison with Existing Packages
-
-#### node-red-contrib-modbus (BiancoRoyal) – BSD-3-Clause
-
-| Aspect | BiancoRoyal | This Project |
-|--------|-------------|-------------|
-| State management | Hand-coded FSM | XState v5 |
-| Connection pooling | None | Centralized pool |
-| Queue | None | Backpressure queue |
-| Server architecture | Monolithic array | Dynamic event proxy |
-| TLS | None | TLS 1.3, mTLS |
-| Transport | modbus-serial | modbus-serial (same dep, different integration) |
-
-**Assessment:** Architecturally completely different approaches. No functional code was taken from BiancoRoyal.
-
-#### jsmodbus (Cloud-Automation) – MIT
-
-| Aspect | jsmodbus | This Project |
-|--------|---------|-------------|
-| Platform | Standalone Node.js | Node-RED |
-| API | Direct function calls | Node-RED msg passing |
-| Transport | Custom TCP/RTU | modbus-serial (different library!) |
-| State machine | None | XState v5 |
-
-**Assessment:** Different platform, different transport library, different architecture. No overlap.
-
-### Plagiarism Prevention Rules
-
-1. **No copy-paste** of code from existing Modbus packages
-2. **Architecture documentation** shows independent design decisions
-3. **Git history** shows incremental development
-4. **modbus-serial** is used as a dependency (not vendored)
-5. **Code comments** do not contain references to other implementations
-
----
-
-## 4. Rationale for BSD-3-Clause
+## 3. Rationale for BSD-3-Clause
 
 ### Why BSD-3-Clause?
 
@@ -137,22 +99,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## 5. Risk Assessment
+## 4. Risk Assessment
 
 ### Identified Risks
 
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|-----------|
 | License incompatibility of future deps | Low | Medium | Check every new dep before adding |
-| Plagiarism claim by BiancoRoyal | Very Low | High | Architecture documentation, Git history |
+| Incorrect source attribution | Low | Medium | Verify all references point to correct sources |
 | Patent claim (Modbus protocol) | Very Low | Medium | Modbus is open since 2004 |
 | Name conflict | Very Low | Low | "pro" suffix is unique |
 | serialport native build issues | Medium | Low | Mark as optional dependency |
 
 ### Recommendations
 
-1. **Document all design decisions** in [Architecture](ARCHITECTURE.md) and Git history
-2. **Never copy code** from existing implementations
-3. **Check license** of every new dependency before adding
-4. **Keep Git history clean** – no squash of early commits
-5. **Attribution** in README for all used specifications and standards
+1. **Do not copy code** from existing implementations
+2. **Check license** of every new dependency before adding
+3. **Verify source attribution** – ensure all references in the documentation point to the correct sources
+4. **Attribution** in README for all used specifications and standards

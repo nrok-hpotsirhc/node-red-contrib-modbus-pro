@@ -114,7 +114,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - docs/ARCHITECTURE.md – Target architecture documentation
 - docs/TEST_MANUAL.md – Test strategy and mock data policy
 - docs/DEVELOPER_GUIDE.md – Developer guide
-- docs/LEGAL_ANALYSIS.md – License compliance and plagiarism check
+- docs/LEGAL_ANALYSIS.md – License compliance and source attribution
 - docs/REFERENCES.md – Bibliography
 - .gitignore, LICENSE (BSD-3-Clause), .mocharc.yml
 - Project folder structure (src/, test/, examples/, docs/)
