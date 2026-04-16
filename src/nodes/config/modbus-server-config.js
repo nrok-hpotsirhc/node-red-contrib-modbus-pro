@@ -3,6 +3,7 @@
 const { EventEmitter } = require('events');
 const ModbusRTU = require('modbus-serial');
 const crypto = require('crypto');
+const { RegisterCache } = require('../../lib/cache/register-cache');
 
 const ServerTCP = ModbusRTU.ServerTCP;
 
@@ -59,6 +60,21 @@ module.exports = function (RED) {
     node.unitId = parseIntSafe(config.unitId, 255);
     node.responseTimeout = parseIntSafe(config.responseTimeout, 5000);
 
+    // Cache configuration (WP 3.4)
+    node._cache = new RegisterCache({
+      enabled: config.cacheEnabled === true || config.cacheEnabled === 'true',
+      maxSize: parseIntSafe(config.cacheMaxSize, 10000),
+      defaultTTL: parseIntSafe(config.cacheTTL, 60000),
+      cleanupInterval: 30000
+    });
+
+    // Forward cache events as node log messages
+    node._cache.on('evict', function (info) {
+      if (info.reason === 'size') {
+        node.warn(`Cache eviction: max size reached (key: ${info.key})`);
+      }
+    });
+
     // Internal event bus for Modbus-In nodes
     node._requestEmitter = new EventEmitter();
     node._requestEmitter.setMaxListeners(50);
@@ -80,8 +96,9 @@ module.exports = function (RED) {
 
     /**
      * Create a promise-based handler for a Modbus vector callback.
-     * When a request arrives, it emits an event and waits for the
-     * Modbus-Out node to resolve it via resolveRequest().
+     * When a request arrives, it first checks the cache for read requests.
+     * On cache miss, it emits an event and waits for the Modbus-Out node
+     * to resolve it via resolveRequest().
      *
      * @param {number} fc - The function code.
      * @param {number} address - Start address.
@@ -90,6 +107,24 @@ module.exports = function (RED) {
      * @returns {Promise<*>} - Resolved with response data or rejected on timeout.
      */
     function handleRequest(fc, address, quantityOrValue, unitId) {
+      const isWrite = fc === 5 || fc === 6 || fc === 15 || fc === 16;
+
+      // Check cache for read requests
+      if (!isWrite && node._cache.enabled) {
+        const cached = node._cache.get(fc, unitId, address, quantityOrValue);
+        if (cached !== undefined) {
+          return Promise.resolve(cached);
+        }
+      }
+
+      // Invalidate cache on write requests
+      if (isWrite && node._cache.enabled) {
+        const count = (fc === 15 || fc === 16)
+          ? (Array.isArray(quantityOrValue) ? quantityOrValue.length : 1)
+          : 1;
+        node._cache.invalidateOnWrite(fc, unitId, address, count);
+      }
+
       return new Promise(function (resolve, reject) {
         const requestId = generateRequestId();
 
@@ -100,9 +135,17 @@ module.exports = function (RED) {
           reject(err);
         }, node.responseTimeout);
 
-        node._pendingRequests.set(requestId, { resolve, reject, timer });
-
-        const isWrite = fc === 5 || fc === 6 || fc === 15 || fc === 16;
+        node._pendingRequests.set(requestId, {
+          resolve: function (data) {
+            // Cache the response for read requests
+            if (!isWrite && node._cache.enabled) {
+              node._cache.set(fc, unitId, address, quantityOrValue, data);
+            }
+            resolve(data);
+          },
+          reject,
+          timer
+        });
 
         const requestPayload = {
           type: FC_TYPE_MAP[fc] || `fc${fc}`,
@@ -315,6 +358,7 @@ module.exports = function (RED) {
     // Cleanup on close
     node.on('close', function (done) {
       clearTimeout(node._startDeferred);
+      node._cache.destroy();
       node.stopServer().then(function () {
         node._requestEmitter.removeAllListeners();
         done();

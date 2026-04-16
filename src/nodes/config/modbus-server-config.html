@@ -6,13 +6,31 @@
             host: { value: '0.0.0.0' },
             port: { value: 8502, validate: RED.validators.number() },
             unitId: { value: 255, validate: RED.validators.number() },
-            responseTimeout: { value: 5000, validate: RED.validators.number() }
+            responseTimeout: { value: 5000, validate: RED.validators.number() },
+            cacheEnabled: { value: false },
+            cacheMaxSize: { value: 10000, validate: RED.validators.number() },
+            cacheTTL: { value: 60000, validate: RED.validators.number() }
         },
         label: function () {
             if (this.name) {
                 return this.name;
             }
             return 'Server ' + (this.host || '0.0.0.0') + ':' + (this.port || 8502);
+        },
+        oneditprepare: function () {
+            var cacheEnabled = $('#node-config-input-cacheEnabled');
+            var cacheFields = $('.modbus-cache-field');
+
+            function toggleCacheFields() {
+                if (cacheEnabled.is(':checked')) {
+                    cacheFields.show();
+                } else {
+                    cacheFields.hide();
+                }
+            }
+
+            cacheEnabled.on('change', toggleCacheFields);
+            toggleCacheFields();
         }
     });
 </script>
@@ -41,6 +59,24 @@
     <div class="form-row">
         <label for="node-config-input-responseTimeout"><i class="fa fa-clock-o"></i> Response Timeout (ms)</label>
         <input type="text" id="node-config-input-responseTimeout" placeholder="5000">
+    </div>
+
+    <hr>
+
+    <div class="form-row">
+        <label for="node-config-input-cacheEnabled"><i class="fa fa-database"></i> Enable Cache</label>
+        <input type="checkbox" id="node-config-input-cacheEnabled" style="width:auto; margin-left:5px; vertical-align:top;">
+        <span style="font-size:0.9em; color:#888;"> Auto-reply to recurring read requests from cache</span>
+    </div>
+
+    <div class="form-row modbus-cache-field">
+        <label for="node-config-input-cacheTTL"><i class="fa fa-hourglass-half"></i> Cache TTL (ms)</label>
+        <input type="text" id="node-config-input-cacheTTL" placeholder="60000">
+    </div>
+
+    <div class="form-row modbus-cache-field">
+        <label for="node-config-input-cacheMaxSize"><i class="fa fa-th"></i> Max Cache Size</label>
+        <input type="text" id="node-config-input-cacheMaxSize" placeholder="10000">
     </div>
 </script>
 
@@ -82,4 +118,31 @@
         <li>Dynamic data sources (APIs, databases, sensors) as Modbus registers</li>
         <li>Full flow-based control over response logic</li>
     </ul>
+
+    <h3>Response Cache</h3>
+    <p>
+        When enabled, the cache stores responses from the flow in an in-memory hashmap
+        keyed by function code, unit ID, and address. Subsequent read requests for the
+        same data are answered directly from the cache without traversing the flow,
+        significantly reducing latency for recurring reads.
+    </p>
+    <dl class="message-properties">
+        <dt>Enable Cache <span class="property-type">boolean</span></dt>
+        <dd>Activate or deactivate the response cache.</dd>
+        <dt>Cache TTL <span class="property-type">number</span></dt>
+        <dd>
+            Time-to-live in milliseconds for each cached entry. After this time,
+            the entry is considered stale and the next request will be forwarded to the flow.
+            Set to <code>0</code> for no automatic expiration. Default: <code>60000</code> (60 seconds).
+        </dd>
+        <dt>Max Cache Size <span class="property-type">number</span></dt>
+        <dd>
+            Maximum number of entries in the cache. When full, the oldest entry is
+            evicted to make room. Default: <code>10000</code>.
+        </dd>
+    </dl>
+    <p>
+        <b>Write invalidation:</b> When a write operation (FC 05/06/15/16) is received,
+        all cached read entries at the affected addresses are automatically invalidated.
+    </p>
 </script>
