@@ -184,7 +184,7 @@ describe('BackpressureQueue', function () {
 
     it('should continuously drop oldest under flooding', function () {
       const q = new BackpressureQueue({ maxSize: 3, dropStrategy: 'fifo' });
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 100; i++) { // TEST-DATA: integers 0-99 as flood items
         q.enqueue(i);
       }
       expect(q.length).to.equal(3);
@@ -230,7 +230,7 @@ describe('BackpressureQueue', function () {
       q.enqueue('y'); // TEST-DATA: initial fill
       q.enqueue('z'); // TEST-DATA: initial fill
 
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < 50; i++) { // TEST-DATA: overflow items 'overflow-0' to 'overflow-49'
         q.enqueue(`overflow-${i}`);
       }
       expect(q.length).to.equal(3);
