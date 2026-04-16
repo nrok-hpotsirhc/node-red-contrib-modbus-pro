@@ -106,7 +106,6 @@ class ConnectionPool extends EventEmitter {
       return null;
     }
 
-    const startIndex = this._roundRobinIndex;
     let attempts = 0;
 
     while (attempts < this._connections.length) {

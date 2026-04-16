@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "Next-generation Modbus TCP/RTU integration for Node-RED with XState-powered state management, connection pooling, backpressure control, and Modbus/TCP Security (TLS) support.",
   "license": "BSD-3-Clause",
-  "author": "[HIER AUTOR EINTRAGEN]",
+  "author": "Weidmueller Interface GmbH & Co. KG",
   "repository": {
     "type": "git",
-    "url": "https://github.com/[HIER-OWNER]/node-red-contrib-modbus-pro.git"
+    "url": "https://github.com/weidmueller/node-red-contrib-modbus-pro.git"
   },
   "keywords": [
     "node-red",
@@ -25,8 +25,7 @@
   "node-red": {
     "version": ">=3.0.0",
     "nodes": {
-      "modbus-client-config": "src/nodes/config/modbus-client-config.js",
-      "modbus-read": "src/nodes/client/modbus-read.js"
+      "modbus-client-config": "src/nodes/config/modbus-client-config.js"
     }
   },
   "engines": {

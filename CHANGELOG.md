@@ -24,7 +24,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   - Registered `modbus-read` node in package.json `node-red.nodes`
 
 ### Changed
-- **Code Review: Quality, Security & Robustness Improvements**
+- **Code Review #2: Quality & Correctness Improvements**
+  - Fix `package.json`: remove ghost `modbus-read` node entry pointing to non-existent file – would crash Node-RED on load
+  - Fix `package.json`: replace German placeholders `[HIER AUTOR EINTRAGEN]` and `[HIER-OWNER]` with actual values
+  - Fix `.mocharc.yml`: remove invalid `spec-version` key (not a valid mocha config property)
+  - Fix HTML help text: correct "Unit ID (1-247)" to "Unit ID (0-255)" to match `BaseTransport.setID()` validation
+  - Refactor `connection-machine.js`: replace inline anonymous functions in `error` and `backoff` state entries with XState v5 parameterized `notifyStatus` action using resolver functions
+  - Add missing status notifications: `connecting` and `reconnecting` states now emit yellow status via `notifyStatus`
+  - Remove unused `startIndex` variable in `ConnectionPool.acquire()`
+
+- **Code Review #1: Quality, Security & Robustness Improvements**
   - Extract `BaseTransport` base class from TCP/RTU transports – eliminates ~150 lines of code duplication (DRY)
   - Add Modbus-compliant input validation to all transport read/write methods (address 0-65535, register read length 1-125, coil read length 1-2000, write array bounds)
   - Add `setID()` range validation (unit ID 0-255) per Modbus specification

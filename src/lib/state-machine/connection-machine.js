@@ -101,6 +101,10 @@ const connectionMachine = setup({
     },
 
     connecting: {
+      entry: [{
+        type: 'notifyStatus',
+        params: { state: 'connecting', fill: 'yellow', shape: 'dot', text: 'Connecting...' }
+      }],
       on: {
         SUCCESS: {
           target: 'connected',
@@ -224,15 +228,14 @@ const connectionMachine = setup({
     },
 
     error: {
-      entry: [({ context }) => {
-        if (typeof context.onStatusChange === 'function') {
-          context.onStatusChange({
-            state: 'error',
-            fill: 'red',
-            shape: 'ring',
-            text: `Error: ${context.lastError || 'Unknown'}`
-          });
-        }
+      entry: [{
+        type: 'notifyStatus',
+        params: ({ context }) => ({
+          state: 'error',
+          fill: 'red',
+          shape: 'ring',
+          text: `Error: ${context.lastError || 'Unknown'}`
+        })
       }],
       on: {
         RETRY: [
@@ -256,15 +259,14 @@ const connectionMachine = setup({
     },
 
     backoff: {
-      entry: [({ context }) => {
-        if (typeof context.onStatusChange === 'function') {
-          context.onStatusChange({
-            state: 'backoff',
-            fill: 'yellow',
-            shape: 'ring',
-            text: `Reconnecting in ${context.backoffDelay}ms (${context.retryCount}/${context.maxRetries})`
-          });
-        }
+      entry: [{
+        type: 'notifyStatus',
+        params: ({ context }) => ({
+          state: 'backoff',
+          fill: 'yellow',
+          shape: 'ring',
+          text: `Reconnecting in ${context.backoffDelay}ms (${context.retryCount}/${context.maxRetries})`
+        })
       }],
       on: {
         RETRY: {
@@ -277,6 +279,10 @@ const connectionMachine = setup({
     },
 
     reconnecting: {
+      entry: [{
+        type: 'notifyStatus',
+        params: { state: 'reconnecting', fill: 'yellow', shape: 'dot', text: 'Reconnecting...' }
+      }],
       on: {
         SUCCESS: {
           target: 'connected',
