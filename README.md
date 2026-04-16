@@ -1,61 +1,61 @@
 # node-red-contrib-modbus-forge
 
-> Next-Generation Modbus TCP/RTU Integration für Node-RED
+> Next-Generation Modbus TCP/RTU Integration for Node-RED
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Node-RED](https://img.shields.io/badge/Platform-Node--RED-red.svg)](https://nodered.org)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org)
-[![Status](https://img.shields.io/badge/Status-In%20Entwicklung-orange.svg)](#entwicklungsfortschritt)
+[![Status](https://img.shields.io/badge/Status-In%20Development-orange.svg)](#development-progress)
 
 ---
 
-## Entwicklungsfortschritt
+## Development Progress
 
-> **Aktueller Stand:** Projektfundament & Dokumentation abgeschlossen – Implementierung steht bevor.
+> **Current State:** Project foundation & documentation complete – implementation upcoming.
 
-| # | Meilenstein | Status | Fortschritt |
-|---|-------------|--------|-------------|
-| MS-1 | Projektfundament & Transportschicht | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-2 | Zustandsautomat & Connection Management | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-3 | Client/Master – Lese-Nodes | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-4 | Client/Master – Schreib-Nodes & Queue | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-5 | Server/Slave – Proxy-Architektur | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-6 | Server-Caching & Optimierung | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-7 | Modbus/TCP Security | 🔲 Offen | `░░░░░░░░░░` 0 % |
-| MS-8 | Qualitätssicherung & Release | 🔲 Offen | `░░░░░░░░░░` 0 % |
+| # | Milestone | Status | Progress |
+|---|-----------|--------|----------|
+| MS-1 | Project Foundation & Transport Layer | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-2 | State Machine & Connection Management | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-3 | Client/Master – Read Nodes | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-4 | Client/Master – Write Nodes & Queue | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-5 | Server/Slave – Proxy Architecture | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-6 | Server Caching & Optimization | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-7 | Modbus/TCP Security | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-8 | Quality Assurance & Release | 🔲 Open | `░░░░░░░░░░` 0 % |
 
-**Gesamtfortschritt: 0 / 8 Meilensteine abgeschlossen**
+**Overall Progress: 0 / 8 milestones completed**
 
-> Details zu jedem Meilenstein: [MILESTONES.md](MILESTONES.md) · Arbeitspakete: [docs/ARBEITSPAKETE.md](docs/ARBEITSPAKETE.md)
+> Milestone details: [MILESTONES.md](MILESTONES.md) · Work packages: [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md)
 
 ---
 
-## Überblick
+## Overview
 
-**node-red-contrib-modbus-forge** ist ein von Grund auf neu entwickeltes Modbus-Integrationspaket für Node-RED, das die architektonischen Schwächen bestehender Legacy-Implementierungen konsequent adressiert. Es bietet:
+**node-red-contrib-modbus-forge** is a ground-up Modbus integration package for Node-RED that systematically addresses the architectural weaknesses of existing legacy implementations. It provides:
 
-- **Deterministisches State-Management** via [XState](https://xstate.js.org/) – eliminiert Race Conditions und undefinierte Zustände
-- **Zentralisiertes Connection Pooling** – TCP-Multiplexing und RTU-Semaphore-Serialisierung
-- **Backpressure-Management** – konfigurierbare Queue-Limits mit FIFO/LIFO-Drop-Strategien
-- **Dynamisches Server-Proxying** – event-basierte Verarbeitung ohne monolithische Speicher-Arrays
-- **Modbus/TCP Security (MBTPS)** – TLS 1.3, mTLS via X.509v3, Port 802
-- **Vollständige Function-Code-Unterstützung** – FC 01-06, 15, 16 und Diagnostik
+- **Deterministic State Management** via [XState](https://xstate.js.org/) – eliminates race conditions and undefined states
+- **Centralized Connection Pooling** – TCP multiplexing and RTU semaphore serialization
+- **Backpressure Management** – configurable queue limits with FIFO/LIFO drop strategies
+- **Dynamic Server Proxying** – event-based processing without monolithic memory arrays
+- **Modbus/TCP Security (MBTPS)** – TLS 1.3, mTLS via X.509v3, port 802
+- **Full Function Code Support** – FC 01-06, 15, 16 and diagnostics
 
-## Architekturprinzipien
+## Architecture Principles
 
-Dieses Projekt basiert auf einer umfassenden Anforderungsanalyse, dokumentiert in:
+This project is based on a comprehensive requirements analysis, documented in:
 
-| Dokument | Beschreibung |
+| Document | Description |
 |----------|-------------|
-| [agents.md](agents.md) | KI-Agent-Leitfaden für die Entwicklung |
-| [docs/THEORETISCHE_GRUNDLAGEN.md](docs/THEORETISCHE_GRUNDLAGEN.md) | Vollständige theoretische Fundierung |
-| [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md) | Architektur-Dokumentation |
-| [docs/ARBEITSPAKETE.md](docs/ARBEITSPAKETE.md) | Detaillierte Arbeitspakete |
-| [MILESTONES.md](MILESTONES.md) | Meilensteinplanung |
-| [docs/TESTHANDBUCH.md](docs/TESTHANDBUCH.md) | Test-Dokumentation & Strategie |
-| [docs/ENTWICKLERHANDBUCH.md](docs/ENTWICKLERHANDBUCH.md) | Entwickler-Leitfaden |
-| [docs/RECHTSANALYSE.md](docs/RECHTSANALYSE.md) | Lizenz- & Rechtsanalyse |
-| [docs/REFERENZEN.md](docs/REFERENZEN.md) | Quellenverzeichnis |
+| [agents.md](agents.md) | AI agent guide for development |
+| [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_FOUNDATIONS.md) | Complete theoretical foundation |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture documentation |
+| [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md) | Detailed work packages |
+| [MILESTONES.md](MILESTONES.md) | Milestone planning |
+| [docs/TEST_MANUAL.md](docs/TEST_MANUAL.md) | Test documentation & strategy |
+| [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) | Developer guide |
+| [docs/LEGAL_ANALYSIS.md](docs/LEGAL_ANALYSIS.md) | License & legal analysis |
+| [docs/REFERENCES.md](docs/REFERENCES.md) | Bibliography |
 
 ## Installation
 
@@ -63,31 +63,31 @@ Dieses Projekt basiert auf einer umfassenden Anforderungsanalyse, dokumentiert i
 npm install node-red-contrib-modbus-forge
 ```
 
-Für serielle RTU-Unterstützung:
+For serial RTU support:
 
 ```bash
 npm install node-red-contrib-modbus-forge serialport
 ```
 
-## Schnellstart
+## Quick Start
 
-### Modbus TCP Client (Lesen von Holding Registern)
+### Modbus TCP Client (Reading Holding Registers)
 
-1. Ziehe einen **Modbus Client Config**-Knoten in den Flow
-2. Konfiguriere IP-Adresse und Port (Standard: 502)
-3. Füge einen **Modbus Read**-Knoten hinzu und wähle FC 03 (Read Holding Registers)
-4. Verbinde mit einem Debug-Knoten zur Ausgabe
+1. Drag a **Modbus Client Config** node into the flow
+2. Configure IP address and port (default: 502)
+3. Add a **Modbus Read** node and select FC 03 (Read Holding Registers)
+4. Connect to a Debug node for output
 
-### Modbus Server (Slave-Simulation)
+### Modbus Server (Slave Simulation)
 
-1. Ziehe einen **Modbus Server Config**-Knoten in den Flow
-2. Verbinde **Modbus-In** und **Modbus-Out** Knoten für dynamisches Adress-Proxying
-3. Verarbeite eingehende Anfragen im Flow und sende Antworten zurück
+1. Drag a **Modbus Server Config** node into the flow
+2. Connect **Modbus-In** and **Modbus-Out** nodes for dynamic address proxying
+3. Process incoming requests in the flow and send responses back
 
-## Unterstützte Function Codes
+## Supported Function Codes
 
-| FC | Funktion | Datentyp |
-|----|----------|----------|
+| FC | Function | Data Type |
+|----|----------|-----------|
 | 01 | Read Coils | Bit (R) |
 | 02 | Read Discrete Inputs | Bit (R) |
 | 03 | Read Holding Registers | 16-Bit (R) |
@@ -97,65 +97,65 @@ npm install node-red-contrib-modbus-forge serialport
 | 15 | Write Multiple Coils | Bit[] (W) |
 | 16 | Write Multiple Registers | 16-Bit[] (W) |
 
-## Projektstruktur
+## Project Structure
 
 ```
 node-red-contrib-modbus-forge/
 ├── src/
-│   ├── nodes/          # Node-RED Knoten (HTML + JS)
-│   │   ├── config/     # Konfigurations-Knoten (TCP/RTU/Security)
-│   │   ├── client/     # Client/Master Knoten (Read/Write)
-│   │   └── server/     # Server/Slave Knoten (In/Out)
-│   ├── lib/            # Interne Bibliotheken
-│   │   ├── transport/  # TCP & RTU Abstraktion
-│   │   ├── state-machine/ # XState Zustandsautomat
-│   │   ├── queue/      # Backpressure & Queue-Management
-│   │   ├── security/   # TLS/mTLS Integration
-│   │   └── parser/     # Endianness & Buffer-Parsing
-│   └── index.js        # Einstiegspunkt
+│   ├── nodes/          # Node-RED nodes (HTML + JS)
+│   │   ├── config/     # Configuration nodes (TCP/RTU/Security)
+│   │   ├── client/     # Client/Master nodes (Read/Write)
+│   │   └── server/     # Server/Slave nodes (In/Out)
+│   ├── lib/            # Internal libraries
+│   │   ├── transport/  # TCP & RTU abstraction
+│   │   ├── state-machine/ # XState state machine
+│   │   ├── queue/      # Backpressure & queue management
+│   │   ├── security/   # TLS/mTLS integration
+│   │   └── parser/     # Endianness & buffer parsing
+│   └── index.js        # Entry point
 ├── test/
-│   ├── unit/           # Unit Tests (Mocha/Chai)
-│   ├── integration/    # Integrationstests
-│   ├── fixtures/       # Test-Fixtures (dokumentiert!)
-│   ├── mocks/          # Mock-Objekte (dokumentiert!)
-│   └── helpers/        # Test-Hilfsfunktionen
+│   ├── unit/           # Unit tests (Mocha/Chai)
+│   ├── integration/    # Integration tests
+│   ├── fixtures/       # Test fixtures (documented!)
+│   ├── mocks/          # Mock objects (documented!)
+│   └── helpers/        # Test helper functions
 └── examples/
-    └── flows/          # Beispiel-Flows
+    └── flows/          # Example flows
 ```
 
-## Entwicklung
+## Development
 
 ```bash
-# Abhängigkeiten installieren
+# Install dependencies
 npm install
 
-# Tests ausführen
+# Run tests
 npm test
 
-# Nur Unit-Tests
+# Unit tests only
 npm run test:unit
 
-# Code Coverage
+# Code coverage
 npm run test:coverage
 
 # Linting
 npm run lint
 ```
 
-## Lizenz
+## License
 
-Dieses Projekt steht unter der **BSD-3-Clause-Lizenz**. Siehe [LICENSE](LICENSE) für Details.
+This project is licensed under the **BSD-3-Clause License**. See [LICENSE](LICENSE) for details.
 
-Die BSD-3-Clause wurde bewusst gewählt, um:
-- Maximale Kompatibilität mit industriellen White-Label-Anwendungen zu gewährleisten
-- Den Non-Endorsement-Schutz (Klausel 3) für die Originalautoren sicherzustellen
-- Kompatibilität mit den Lizenzen aller Abhängigkeiten (ISC, MIT, Apache 2.0) zu garantieren
+BSD-3-Clause was deliberately chosen to:
+- Ensure maximum compatibility with industrial white-label applications
+- Provide non-endorsement protection (clause 3) for the original authors
+- Guarantee compatibility with all dependency licenses (ISC, MIT, Apache 2.0)
 
-## Abgrenzung zu bestehenden Paketen
+## Differentiation from Existing Packages
 
-Dieses Projekt ist eine **vollständige Neuentwicklung** und enthält keinen kopierten Code aus:
+This project is a **complete rewrite** and contains no copied code from:
 - `node-red-contrib-modbus` (BiancoRoyal, BSD-3-Clause)
-- `modbus-serial` (yaacov, ISC) – wird als **Dependency** verwendet, nicht kopiert
-- `jsmodbus` (Cloud-Automation, MIT) – architektonische Konzepte als Inspiration
+- `modbus-serial` (yaacov, ISC) – used as a **dependency**, not copied
+- `jsmodbus` (Cloud-Automation, MIT) – architectural concepts as inspiration
 
-Siehe [docs/RECHTSANALYSE.md](docs/RECHTSANALYSE.md) für die vollständige rechtliche Bewertung.
+See [docs/LEGAL_ANALYSIS.md](docs/LEGAL_ANALYSIS.md) for the complete legal assessment.

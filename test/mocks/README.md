@@ -1,50 +1,37 @@
-# Mock-Objekte Katalog
-
-> PFLICHTDOKUMENT: Jede Mock-Datei in diesem Verzeichnis MUSS hier katalogisiert sein.
-> Siehe auch: [Testhandbuch](../../docs/TESTHANDBUCH.md) | [agents.md](../../agents.md) §5
-
+﻿# Mock Objects Catalog
+> MANDATORY DOCUMENT: Every mock file in this directory MUST be cataloged here.
+> See also: [Test Manual](../../docs/TEST_MANUAL.md) | [agents.md](../../agents.md) §5
 ---
-
-## Verzeichnisstruktur
-
+## Directory Structure
 ```
 test/mocks/
-├── README.md                 ← Dieses Dokument (Katalog)
-├── mock-serial-port.js       # Mock für serialport (geplant: MS-1)
-├── mock-tcp-socket.js        # Mock für net.Socket (geplant: MS-1)
-└── mock-modbus-server.js     # Mock Modbus TCP Server (geplant: MS-3)
+├── README.md                 ← This document (catalog)
+├── mock-serial-port.js       # Mock for serialport (planned: MS-1)
+├── mock-tcp-socket.js        # Mock for net.Socket (planned: MS-1)
+└── mock-modbus-server.js     # Mock Modbus TCP Server (planned: MS-3)
 ```
-
-## Katalog
-
-| Datei | Simuliert | Verwendet in | Zuletzt aktualisiert | Entfernbar? | Abhängigkeiten |
-|-------|----------|-------------|---------------------|-------------|---------------|
-| _noch leer_ | Wird in MS-1 (WP 1.1) erstellt | — | — | — | — |
-
+## Catalog
+| File | Simulates | Used In | Last Updated | Removable? | Dependencies |
+|------|----------|---------|-------------|------------|-------------|
+| _empty_ | Will be created in MS-1 (WP 1.1) | — | — | — | — |
 ---
-
-## Richtlinien
-
-### Header-Pflicht
-
-Jede Mock-Datei MUSS folgenden Header-Kommentar enthalten:
-
+## Guidelines
+### Mandatory Header
+Every mock file MUST contain the following header comment:
 ```javascript
 /**
- * MOCK: [Kurzbeschreibung]
- * SIMULIERT: [Was wird simuliert?]
- * VERWENDET IN: [Liste der Test-Dateien]
- * ZULETZT AKTUALISIERT: [Datum]
- * ENTFERNBAR: [ja/nein – Begründung]
- * ABHÄNGIGKEITEN: [Welche Module werden gemockt?]
+ * MOCK: [Short description]
+ * SIMULATES: [What is being simulated?]
+ * USED IN: [List of test files]
+ * LAST UPDATED: [Date]
+ * REMOVABLE: [yes/no – rationale]
+ * DEPENDENCIES: [Which modules are being mocked?]
  */
 ```
-
-### Allgemeine Regeln
-
-1. **Jede neue Mock-Datei** muss in der obigen Tabelle eingetragen werden
-2. **Mocks dürfen nur in `test/`** verwendet werden, NIEMALS in `src/`
-3. **Naming Convention:** `mock-<was-gemockt-wird>.js`
-4. **Mocks müssen deterministisch sein** – keine zufälligen Werte ohne Seed
-5. **Mocks müssen die reale API möglichst genau nachbilden** – gleiche Methodennamen und Signaturen
-6. **Cleanup:** Mocks die nicht mehr benötigt werden, entfernen und aus diesem Katalog streichen
+### General Rules
+1. **Every new mock file** must be registered in the table above
+2. **Mocks may only be used in `test/`** – NEVER in `src/`
+3. **Naming convention:** `mock-<what-is-mocked>.js`
+4. **Mocks must be deterministic** – no random values without seed
+5. **Mocks must replicate the real API as closely as possible** – same method names and signatures
+6. **Cleanup:** Remove mocks that are no longer needed and delete them from this catalog

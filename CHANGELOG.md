@@ -1,24 +1,28 @@
 # Changelog
 
-Alle wesentlichen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+All notable changes to this project will be documented in this file.
 
-Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
-Dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+This project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
 ## [Unreleased]
 
-### Hinzugefügt
-- Projektstruktur und Dokumentation initialisiert
-- agents.md – KI-Agent-Leitfaden
-- MILESTONES.md – Meilensteinplanung (8 Meilensteine)
-- docs/ARBEITSPAKETE.md – Work Breakdown Structure (WP 1.1–5.4)
-- docs/THEORETISCHE_GRUNDLAGEN.md – Vollständige theoretische Fundierung
-- docs/ARCHITEKTUR.md – Zielarchitektur-Dokumentation
-- docs/TESTHANDBUCH.md – Teststrategie und Mock-Daten-Policy
-- docs/ENTWICKLERHANDBUCH.md – Entwickler-Leitfaden
-- docs/RECHTSANALYSE.md – Lizenz-Compliance und Plagiatsprüfung
-- docs/REFERENZEN.md – Quellenverzeichnis
+### Added
+- Project structure and documentation initialized
+- agents.md – AI agent guide
+- MILESTONES.md – Milestone planning (8 milestones)
+- docs/WORK_PACKAGES.md – Work Breakdown Structure (WP 1.1–5.4)
+- docs/THEORETICAL_FOUNDATIONS.md – Complete theoretical foundation
+- docs/ARCHITECTURE.md – Target architecture documentation
+- docs/TEST_MANUAL.md – Test strategy and mock data policy
+- docs/DEVELOPER_GUIDE.md – Developer guide
+- docs/LEGAL_ANALYSIS.md – License compliance and plagiarism check
+- docs/REFERENCES.md – Bibliography
 - .gitignore, LICENSE (BSD-3-Clause), .mocharc.yml
-- Projektordnerstruktur (src/, test/, examples/, docs/)
+- Project folder structure (src/, test/, examples/, docs/)
+
+### Changed
+- All documentation translated from German to English
+- Documentation files renamed to English (e.g. ARBEITSPAKETE.md → WORK_PACKAGES.md)

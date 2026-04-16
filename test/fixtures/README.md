@@ -1,39 +1,27 @@
-# Test-Fixtures Katalog
-
-> PFLICHTDOKUMENT: Jede Fixture-Datei in diesem Verzeichnis MUSS hier katalogisiert sein.
-> Siehe auch: [Testhandbuch](../../docs/TESTHANDBUCH.md) | [agents.md](../../agents.md) §5
-
+﻿# Test Fixtures Catalog
+> MANDATORY DOCUMENT: Every fixture file in this directory MUST be cataloged here.
+> See also: [Test Manual](../../docs/TEST_MANUAL.md) | [agents.md](../../agents.md) §5
 ---
-
-## Verzeichnisstruktur
-
+## Directory Structure
 ```
 test/fixtures/
-├── README.md              ← Dieses Dokument (Katalog)
-├── register-maps/         # Beispiel-Register-Maps verschiedener Geräte
-└── certs/                 # Selbstsignierte Test-Zertifikate
+├── README.md              ← This document (catalog)
+├── register-maps/         # Example register maps of various devices
+└── certs/                 # Self-signed test certificates
 ```
-
-## Katalog
-
+## Catalog
 ### register-maps/
-
-| Datei | Beschreibung | Verwendet in | Zuletzt aktualisiert | Entfernbar? |
-|-------|-------------|-------------|---------------------|-------------|
-| _noch leer_ | Wird in MS-3 (WP 2.1/2.4) befüllt | — | — | — |
-
+| File | Description | Used In | Last Updated | Removable? |
+|------|-------------|---------|-------------|------------|
+| _empty_ | Will be populated in MS-3 (WP 2.1/2.4) | — | — | — |
 ### certs/
-
-| Datei | Beschreibung | Verwendet in | Zuletzt aktualisiert | Entfernbar? |
-|-------|-------------|-------------|---------------------|-------------|
-| _noch leer_ | Wird in MS-7 (WP 4.1–4.3) befüllt | — | — | — |
-
+| File | Description | Used In | Last Updated | Removable? |
+|------|-------------|---------|-------------|------------|
+| _empty_ | Will be populated in MS-7 (WP 4.1–4.3) | — | — | — |
 ---
-
-## Richtlinien
-
-1. **Jede neue Fixture-Datei** muss in der obigen Tabelle eingetragen werden
-2. **Keine Produktionsdaten** – nur synthetische, generierte Testdaten
-3. **Keine echten Zertifikate** – nur selbstsignierte für Tests
-4. **Beschreibung** muss klar beschreiben, was die Fixture simuliert
-5. **Verwendet in** muss die Test-Dateien auflisten, die diese Fixture nutzen
+## Guidelines
+1. **Every new fixture file** must be registered in the table above
+2. **No production data** – only synthetic, generated test data
+3. **No real certificates** – only self-signed for tests
+4. **Description** must clearly state what the fixture simulates
+5. **Used In** must list the test files that use this fixture
