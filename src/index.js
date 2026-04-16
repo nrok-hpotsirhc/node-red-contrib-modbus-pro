@@ -2,11 +2,11 @@
 
 /**
  * node-red-contrib-modbus-pro
- * Einstiegspunkt für die Node-RED Node-Registrierung.
+ * Entry point for Node-RED node registration.
  *
- * Dieser Index wird von Node-RED beim Laden des Pakets aufgerufen.
- * Die tatsächliche Registrierung erfolgt über die package.json "node-red.nodes" Einträge.
+ * This index is called by Node-RED when loading the package.
+ * Actual registration is controlled via the package.json "node-red.nodes" entries.
  */
 
-// Node-Registrierungen werden über package.json node-red.nodes gesteuert.
-// Dieser Einstiegspunkt kann für gemeinsame Initialisierungslogik genutzt werden.
+// Node registrations are controlled via package.json node-red.nodes.
+// This entry point can be used for shared initialisation logic.

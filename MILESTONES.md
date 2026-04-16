@@ -10,7 +10,7 @@
 
 | # | Milestone | Status | Work Packages | Focus |
 |---|-----------|--------|---------------|-------|
-| MS-1 | Project Foundation & Transport Layer | [ ] Open | WP 1.1, WP 1.2 | Library abstraction, config node UI |
+| MS-1 | Project Foundation & Transport Layer | [x] Complete | WP 1.1, WP 1.2 | Library abstraction, config node UI |
 | MS-2 | State Machine & Connection Management | [ ] Open | WP 1.3, WP 1.4 | XState FSM, connection pool, semaphore |
 | MS-3 | Client/Master – Read Nodes | [ ] Open | WP 2.1, WP 2.4 | FC 01-04, payload parsing, endianness |
 | MS-4 | Client/Master – Write Nodes & Queue | [ ] Open | WP 2.2, WP 2.3 | FC 05/06/15/16, backpressure |
@@ -30,15 +30,15 @@
 - **WP 1.2** – Development of config nodes (HTML/JS UI for TCP and RTU parameters)
 
 **Deliverables:**
-- [ ] `src/lib/transport/tcp-transport.js` – TCP socket abstraction over modbus-serial
-- [ ] `src/lib/transport/rtu-transport.js` – RTU serial abstraction (graceful fallback without serialport)
-- [ ] `src/lib/transport/transport-factory.js` – Factory pattern for transport selection
-- [ ] `src/nodes/config/modbus-client-config.js` – Config node logic
-- [ ] `src/nodes/config/modbus-client-config.html` – Config node UI (IP, port, baud rate, parity, etc.)
-- [ ] `test/unit/transport/tcp-transport.test.js` – Unit tests TCP
-- [ ] `test/unit/transport/rtu-transport.test.js` – Unit tests RTU
-- [ ] `test/mocks/mock-serial-port.js` – Mock for serialport (documented in mocks/README.md)
-- [ ] `test/mocks/mock-tcp-socket.js` – Mock for net.Socket (documented in mocks/README.md)
+- [x] `src/lib/transport/tcp-transport.js` – TCP socket abstraction over modbus-serial
+- [x] `src/lib/transport/rtu-transport.js` – RTU serial abstraction (graceful fallback without serialport)
+- [x] `src/lib/transport/transport-factory.js` – Factory pattern for transport selection
+- [x] `src/nodes/config/modbus-client-config.js` – Config node logic
+- [x] `src/nodes/config/modbus-client-config.html` – Config node UI (IP, port, baud rate, parity, etc.)
+- [x] `test/unit/transport/tcp-transport.test.js` – Unit tests TCP
+- [x] `test/unit/transport/rtu-transport.test.js` – Unit tests RTU
+- [x] `test/mocks/mock-serial-port.js` – Mock for serialport (documented in mocks/README.md)
+- [x] `test/mocks/mock-tcp-socket.js` – Mock for net.Socket (documented in mocks/README.md)
 
 **Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §2 Transport Layers](docs/THEORETICAL_FOUNDATIONS.md#2-transport-layers-modbus-rtu-vs-modbus-tcp)
 
@@ -239,7 +239,7 @@
 
 | Date | Milestone | Status | Notes |
 |------|-----------|--------|-------|
-| _TBD_ | MS-1 | Open | — |
+| 2026-04-16 | MS-1 | Complete | Transport layer, config node, unit tests (82 passing) |
 | _TBD_ | MS-2 | Open | — |
 | _TBD_ | MS-3 | Open | — |
 | _TBD_ | MS-4 | Open | — |

@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "node-red-contrib-modbus-pro",
   "version": "0.1.0",
   "description": "Next-generation Modbus TCP/RTU integration for Node-RED with XState-powered state management, connection pooling, backpressure control, and Modbus/TCP Security (TLS) support.",
