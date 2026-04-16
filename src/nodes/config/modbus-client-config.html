@@ -1,0 +1,165 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-client-config', {
+        category: 'config',
+        defaults: {
+            name: { value: '' },
+            connectionType: { value: 'tcp' },
+            host: { value: '127.0.0.1' },
+            port: { value: 502, validate: RED.validators.number() },
+            serialPort: { value: '/dev/ttyUSB0' },
+            baudRate: { value: '9600' },
+            parity: { value: 'none' },
+            dataBits: { value: '8' },
+            stopBits: { value: '1' },
+            unitId: { value: 1, validate: RED.validators.number() },
+            timeout: { value: 1000, validate: RED.validators.number() }
+        },
+        credentials: {
+            password: { type: 'password' },
+            certPath: { type: 'text' },
+            keyPath: { type: 'password' },
+            caPath: { type: 'text' }
+        },
+        label: function () {
+            if (this.name) {
+                return this.name;
+            }
+            if (this.connectionType === 'rtu') {
+                return 'RTU ' + (this.serialPort || '/dev/ttyUSB0') + '@' + (this.baudRate || '9600');
+            }
+            return 'TCP ' + (this.host || '127.0.0.1') + ':' + (this.port || 502);
+        },
+        oneditprepare: function () {
+            var connectionType = $('#node-config-input-connectionType');
+
+            function toggleFields() {
+                var type = connectionType.val();
+                if (type === 'tcp') {
+                    $('.modbus-tcp-fields').show();
+                    $('.modbus-rtu-fields').hide();
+                } else {
+                    $('.modbus-tcp-fields').hide();
+                    $('.modbus-rtu-fields').show();
+                }
+            }
+
+            connectionType.on('change', toggleFields);
+            toggleFields();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-client-config">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Modbus Connection">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-connectionType"><i class="fa fa-exchange"></i> Type</label>
+        <select id="node-config-input-connectionType">
+            <option value="tcp">TCP</option>
+            <option value="rtu">RTU (Serial)</option>
+        </select>
+    </div>
+
+    <!-- TCP Fields -->
+    <div class="modbus-tcp-fields">
+        <div class="form-row">
+            <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+            <input type="text" id="node-config-input-host" placeholder="127.0.0.1">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-port"><i class="fa fa-random"></i> Port</label>
+            <input type="text" id="node-config-input-port" placeholder="502">
+        </div>
+    </div>
+
+    <!-- RTU Fields -->
+    <div class="modbus-rtu-fields" style="display:none;">
+        <div class="form-row">
+            <label for="node-config-input-serialPort"><i class="fa fa-usb"></i> Serial Port</label>
+            <input type="text" id="node-config-input-serialPort" placeholder="/dev/ttyUSB0">
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-baudRate"><i class="fa fa-tachometer"></i> Baud Rate</label>
+            <select id="node-config-input-baudRate">
+                <option value="9600">9600</option>
+                <option value="19200">19200</option>
+                <option value="38400">38400</option>
+                <option value="57600">57600</option>
+                <option value="115200">115200</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-parity"><i class="fa fa-check-square-o"></i> Parity</label>
+            <select id="node-config-input-parity">
+                <option value="none">None</option>
+                <option value="even">Even</option>
+                <option value="odd">Odd</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-dataBits"><i class="fa fa-ellipsis-h"></i> Data Bits</label>
+            <select id="node-config-input-dataBits">
+                <option value="8">8</option>
+                <option value="7">7</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label for="node-config-input-stopBits"><i class="fa fa-stop"></i> Stop Bits</label>
+            <select id="node-config-input-stopBits">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Common Fields -->
+    <div class="form-row">
+        <label for="node-config-input-unitId"><i class="fa fa-hashtag"></i> Unit ID</label>
+        <input type="text" id="node-config-input-unitId" placeholder="1">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-timeout"><i class="fa fa-clock-o"></i> Timeout (ms)</label>
+        <input type="text" id="node-config-input-timeout" placeholder="1000">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-client-config">
+    <p>Configuration node for Modbus client connections.</p>
+    <h3>Connection Types</h3>
+    <dl class="message-properties">
+        <dt>TCP</dt>
+        <dd>Connect to a Modbus device via TCP/IP. Requires a host address and port number.</dd>
+        <dt>RTU (Serial)</dt>
+        <dd>Connect to a Modbus device via serial port (RS-232/RS-485). Requires the <code>serialport</code> package to be installed.</dd>
+    </dl>
+    <h3>TCP Settings</h3>
+    <dl class="message-properties">
+        <dt>Host <span class="property-type">string</span></dt>
+        <dd>IP address or hostname of the Modbus device. Default: <code>127.0.0.1</code></dd>
+        <dt>Port <span class="property-type">number</span></dt>
+        <dd>TCP port number. Default: <code>502</code></dd>
+    </dl>
+    <h3>RTU Settings</h3>
+    <dl class="message-properties">
+        <dt>Serial Port <span class="property-type">string</span></dt>
+        <dd>Path to the serial port device (e.g., <code>/dev/ttyUSB0</code>, <code>COM3</code>).</dd>
+        <dt>Baud Rate <span class="property-type">number</span></dt>
+        <dd>Communication speed. Common values: 9600, 19200, 38400, 57600, 115200.</dd>
+        <dt>Parity <span class="property-type">string</span></dt>
+        <dd>Error detection: None, Even, or Odd.</dd>
+        <dt>Data Bits <span class="property-type">number</span></dt>
+        <dd>Number of data bits per character: 7 or 8.</dd>
+        <dt>Stop Bits <span class="property-type">number</span></dt>
+        <dd>Number of stop bits: 1 or 2.</dd>
+    </dl>
+    <h3>Common Settings</h3>
+    <dl class="message-properties">
+        <dt>Unit ID <span class="property-type">number</span></dt>
+        <dd>Modbus slave/unit ID (1-247). Default: <code>1</code></dd>
+        <dt>Timeout <span class="property-type">number</span></dt>
+        <dd>Response timeout in milliseconds. Default: <code>1000</code></dd>
+    </dl>
+</script>
