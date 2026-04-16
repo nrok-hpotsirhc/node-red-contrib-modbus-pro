@@ -3,27 +3,17 @@
 const TransportFactory = require('../../lib/transport/transport-factory');
 
 /**
- * Default TCP transport configuration.
+ * Parse a string to an integer, returning the default value
+ * if the result is not a finite number. Unlike `parseInt(x) || default`,
+ * this correctly handles 0 as a valid value (e.g. unitId 0 for TCP broadcast).
+ * @param {*} value - Value to parse.
+ * @param {number} defaultValue - Fallback if parsing fails.
+ * @returns {number}
  */
-const TCP_DEFAULTS = {
-  host: '127.0.0.1',
-  port: 502,
-  unitId: 1,
-  timeout: 1000
-};
-
-/**
- * Default RTU transport configuration.
- */
-const RTU_DEFAULTS = {
-  serialPort: '/dev/ttyUSB0',
-  baudRate: 9600,
-  parity: 'none',
-  dataBits: 8,
-  stopBits: 1,
-  unitId: 1,
-  timeout: 1000
-};
+function parseIntSafe(value, defaultValue) {
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : defaultValue;
+}
 
 /**
  * Modbus Client Config node for Node-RED.
@@ -43,20 +33,20 @@ module.exports = function (RED) {
     node.connectionType = config.connectionType || 'tcp';
     node.name = config.name || '';
 
-    // Store TCP parameters with defaults
-    node.host = config.host || TCP_DEFAULTS.host;
-    node.port = parseInt(config.port, 10) || TCP_DEFAULTS.port;
+    // Store TCP parameters
+    node.host = config.host || '127.0.0.1';
+    node.port = parseIntSafe(config.port, 502);
 
-    // Store RTU parameters with defaults
-    node.serialPort = config.serialPort || RTU_DEFAULTS.serialPort;
-    node.baudRate = parseInt(config.baudRate, 10) || RTU_DEFAULTS.baudRate;
-    node.parity = config.parity || RTU_DEFAULTS.parity;
-    node.dataBits = parseInt(config.dataBits, 10) || RTU_DEFAULTS.dataBits;
-    node.stopBits = parseInt(config.stopBits, 10) || RTU_DEFAULTS.stopBits;
+    // Store RTU parameters
+    node.serialPort = config.serialPort || '/dev/ttyUSB0';
+    node.baudRate = parseIntSafe(config.baudRate, 9600);
+    node.parity = config.parity || 'none';
+    node.dataBits = parseIntSafe(config.dataBits, 8);
+    node.stopBits = parseIntSafe(config.stopBits, 1);
 
     // Common parameters
-    node.unitId = parseInt(config.unitId, 10) || TCP_DEFAULTS.unitId;
-    node.timeout = parseInt(config.timeout, 10) || TCP_DEFAULTS.timeout;
+    node.unitId = parseIntSafe(config.unitId, 1);
+    node.timeout = parseIntSafe(config.timeout, 1000);
 
     // Transport instance placeholder (created on demand in MS-2)
     node._transport = null;

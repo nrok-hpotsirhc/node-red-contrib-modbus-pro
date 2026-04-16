@@ -1,7 +1,6 @@
 'use strict';
 
-const EventEmitter = require('events');
-const ModbusRTU = require('modbus-serial');
+const BaseTransport = require('./base-transport');
 
 /**
  * Check whether the serialport package is available.
@@ -40,9 +39,9 @@ const RTU_DEFAULTS = {
  *
  * Emits lifecycle events: 'connect', 'disconnect', 'error'.
  *
- * @extends EventEmitter
+ * @extends BaseTransport
  */
-class RtuTransport extends EventEmitter {
+class RtuTransport extends BaseTransport {
   /**
    * @param {object} config - Transport configuration.
    * @param {string} [config.serialPort='/dev/ttyUSB0'] - Serial port path.
@@ -54,19 +53,8 @@ class RtuTransport extends EventEmitter {
    * @param {number} [config.timeout=5000] - Response timeout in milliseconds.
    */
   constructor(config = {}) {
-    super();
-    this._config = { ...RTU_DEFAULTS, ...config };
-    this._client = new ModbusRTU();
-    this._connected = false;
+    super({ ...RTU_DEFAULTS, ...config });
     this._serialAvailable = isSerialPortAvailable();
-
-    this._client.on('close', () => {
-      this._handleDisconnect();
-    });
-
-    this._client.on('error', (err) => {
-      this.emit('error', err);
-    });
   }
 
   /**
@@ -111,7 +99,7 @@ class RtuTransport extends EventEmitter {
         dataBits: this._config.dataBits,
         stopBits: this._config.stopBits
       });
-      this._client.setID(this._config.unitId);
+      this.setID(this._config.unitId);
       this._client.setTimeout(this._config.timeout);
       this._connected = true;
       this.emit('connect');
@@ -119,175 +107,6 @@ class RtuTransport extends EventEmitter {
       this._connected = false;
       this.emit('error', err);
       throw err;
-    }
-  }
-
-  /**
-   * Disconnect from the serial port.
-   * @returns {Promise<void>}
-   */
-  async disconnect() {
-    if (!this._connected) {
-      return;
-    }
-
-    try {
-      this._client.close(() => {});
-      this._handleDisconnect();
-    } catch (err) {
-      this._connected = false;
-      this.emit('error', err);
-      throw err;
-    }
-  }
-
-  /**
-   * Check whether the underlying serial connection is open.
-   * @returns {boolean}
-   */
-  isOpen() {
-    return this._connected && this._client.isOpen;
-  }
-
-  /**
-   * Get the current Modbus unit/slave ID.
-   * @returns {number}
-   */
-  getID() {
-    return this._client.getID();
-  }
-
-  /**
-   * Set the Modbus unit/slave ID for subsequent requests.
-   * @param {number} id - Unit/slave ID (1-247).
-   */
-  setID(id) {
-    this._client.setID(id);
-  }
-
-  // -- Read operations --
-
-  /**
-   * Read holding registers (FC 03).
-   * @param {number} address - Starting register address.
-   * @param {number} length - Number of registers to read.
-   * @returns {Promise<{data: number[], buffer: Buffer}>}
-   */
-  async readHoldingRegisters(address, length) {
-    this._assertConnected();
-    return this._client.readHoldingRegisters(address, length);
-  }
-
-  /**
-   * Read coils (FC 01).
-   * @param {number} address - Starting coil address.
-   * @param {number} length - Number of coils to read.
-   * @returns {Promise<{data: boolean[], buffer: Buffer}>}
-   */
-  async readCoils(address, length) {
-    this._assertConnected();
-    return this._client.readCoils(address, length);
-  }
-
-  /**
-   * Read discrete inputs (FC 02).
-   * @param {number} address - Starting input address.
-   * @param {number} length - Number of inputs to read.
-   * @returns {Promise<{data: boolean[], buffer: Buffer}>}
-   */
-  async readDiscreteInputs(address, length) {
-    this._assertConnected();
-    return this._client.readDiscreteInputs(address, length);
-  }
-
-  /**
-   * Read input registers (FC 04).
-   * @param {number} address - Starting register address.
-   * @param {number} length - Number of registers to read.
-   * @returns {Promise<{data: number[], buffer: Buffer}>}
-   */
-  async readInputRegisters(address, length) {
-    this._assertConnected();
-    return this._client.readInputRegisters(address, length);
-  }
-
-  // -- Write operations --
-
-  /**
-   * Write a single coil (FC 05).
-   * @param {number} address - Coil address.
-   * @param {boolean} value - Coil value.
-   * @returns {Promise<void>}
-   */
-  async writeCoil(address, value) {
-    this._assertConnected();
-    return this._client.writeCoil(address, value);
-  }
-
-  /**
-   * Write a single holding register (FC 06).
-   * @param {number} address - Register address.
-   * @param {number} value - Register value.
-   * @returns {Promise<void>}
-   */
-  async writeRegister(address, value) {
-    this._assertConnected();
-    return this._client.writeRegister(address, value);
-  }
-
-  /**
-   * Write multiple coils (FC 15).
-   * @param {number} address - Starting coil address.
-   * @param {boolean[]} values - Array of coil values.
-   * @returns {Promise<void>}
-   */
-  async writeCoils(address, values) {
-    this._assertConnected();
-    return this._client.writeCoils(address, values);
-  }
-
-  /**
-   * Write multiple holding registers (FC 16).
-   * @param {number} address - Starting register address.
-   * @param {number[]} values - Array of register values.
-   * @returns {Promise<void>}
-   */
-  async writeRegisters(address, values) {
-    this._assertConnected();
-    return this._client.writeRegisters(address, values);
-  }
-
-  /**
-   * Destroy the transport, removing all listeners and closing the connection.
-   * @returns {Promise<void>}
-   */
-  async destroy() {
-    await this.disconnect();
-    this._client.removeAllListeners();
-    this.removeAllListeners();
-  }
-
-  // -- Internal helpers --
-
-  /**
-   * Assert that the transport is connected before performing an operation.
-   * @throws {Error} If not connected.
-   * @private
-   */
-  _assertConnected() {
-    if (!this._connected) {
-      throw new Error('RtuTransport: not connected');
-    }
-  }
-
-  /**
-   * Handle disconnect state transition and emit event.
-   * @private
-   */
-  _handleDisconnect() {
-    if (this._connected) {
-      this._connected = false;
-      this.emit('disconnect');
     }
   }
 }

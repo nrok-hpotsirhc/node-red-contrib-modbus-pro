@@ -26,9 +26,10 @@ const resetRetry = assign({
 
 /**
  * Store the last error in context.
+ * In XState v5, error data is provided via event.error.
  */
 const storeError = assign({
-  lastError: ({ event }) => event.error || event.data || null
+  lastError: ({ event }) => event.error || null
 });
 
 /**
@@ -42,10 +43,7 @@ const clearError = assign({
  * Enqueue a request into the pending queue.
  */
 const enqueueRequest = assign({
-  queue: ({ context, event }) => {
-    const newQueue = [...context.queue, event.request];
-    return newQueue;
-  }
+  queue: ({ context, event }) => [...context.queue, event.request]
 });
 
 /**
@@ -65,16 +63,18 @@ const clearCurrentRequest = assign({
 });
 
 /**
- * Calculate the exponential backoff delay and store it.
- * Formula: min(baseDelay * 2^retryCount, maxDelay)
+ * Calculate the exponential backoff delay with jitter.
+ * Formula: min(baseDelay * 2^retryCount, maxDelay) ± 25% jitter.
+ * Jitter prevents thundering-herd when multiple clients reconnect simultaneously.
  */
 const calculateBackoff = assign({
   backoffDelay: ({ context }) => {
-    const delay = Math.min(
+    const base = Math.min(
       context.baseDelay * Math.pow(2, context.retryCount),
       context.maxDelay
     );
-    return delay;
+    const jitter = base * 0.25 * (Math.random() * 2 - 1);
+    return Math.min(context.maxDelay, Math.max(0, Math.round(base + jitter)));
   }
 });
 

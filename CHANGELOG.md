@@ -9,6 +9,21 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **Code Review: Quality, Security & Robustness Improvements**
+  - Extract `BaseTransport` base class from TCP/RTU transports – eliminates ~150 lines of code duplication (DRY)
+  - Add Modbus-compliant input validation to all transport read/write methods (address 0-65535, register read length 1-125, coil read length 1-2000, write array bounds)
+  - Add `setID()` range validation (unit ID 0-255) per Modbus specification
+  - Fix `disconnect()` – properly await `close()` callback via Promise instead of fire-and-forget pattern
+  - Fix `storeError` action – remove XState v4 `event.data` fallback, use v5-correct `event.error`
+  - Add ±25% jitter to exponential backoff to prevent thundering-herd reconnection storms
+  - Add `canEnqueue` guard combining `isValidRequest` + `isQueueNotFull` – prevents unbounded queue growth in reading/writing states
+  - Replace dead `self.system.emit()` notification actions with functional `onStatusChange` callback pattern
+  - Fix `RtuSemaphore.drain()` – replace `setTimeout` polling loop with event-based waiting (complete/timeout/error)
+  - Fix `modbus-client-config.js` – replace `parseInt(x) || default` with `parseIntSafe()` to correctly handle value 0 (e.g. unitId 0 for TCP broadcast)
+  - Remove duplicate TCP_DEFAULTS/RTU_DEFAULTS objects from config node (inline defaults)
+  - Simplify `enqueueRequest` action (remove unnecessary temp variable)
+
 ### Added
 - **MS-2: State Machine & Connection Management**
   - `src/lib/state-machine/connection-machine.js` – XState v5 state machine with 8 states (DISCONNECTED, CONNECTING, CONNECTED, READING, WRITING, ERROR, BACKOFF, RECONNECTING)

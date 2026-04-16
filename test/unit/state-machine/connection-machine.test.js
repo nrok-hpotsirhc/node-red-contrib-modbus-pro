@@ -315,6 +315,28 @@ describe('Connection State Machine', function () {
       expect(actor.getSnapshot().value).to.equal('connected');
       expect(actor.getSnapshot().context.queue).to.be.empty;
     });
+
+    it('should reject enqueue when queue is full (canEnqueue guard)', function () {
+      // Create actor with very small queue
+      actor.stop();
+      actor = createConnectionActor({ maxQueueSize: 2 });
+      actor.start();
+      actor.send({ type: 'CONNECT', transport: mockTransport() });
+      actor.send({ type: 'SUCCESS' });
+
+      // First request goes to reading state (enqueue + dequeue → currentRequest)
+      actor.send(readRequest(0, 10));
+      expect(actor.getSnapshot().value).to.equal('reading');
+
+      // Fill the queue while reading
+      actor.send(readRequest(100, 5));
+      actor.send(readRequest(200, 5));
+      expect(actor.getSnapshot().context.queue).to.have.length(2);
+
+      // This request should be silently dropped (queue full)
+      actor.send(readRequest(300, 5));
+      expect(actor.getSnapshot().context.queue).to.have.length(2);
+    });
   });
 
   describe('ERROR → BACKOFF → RECONNECTING', function () {
@@ -338,24 +360,24 @@ describe('Connection State Machine', function () {
       expect(actor.getSnapshot().context.retryCount).to.equal(1);
     });
 
-    it('should calculate exponential backoff delay', function () {
+    it('should calculate exponential backoff delay with jitter', function () {
       actor = createConnectionActor({ maxRetries: 5, baseDelay: 1000 });
       actor.start();
       actor.send({ type: 'CONNECT', transport: mockTransport() });
       actor.send({ type: 'FAILURE', error: 'fail' });
 
-      // First retry: 1000 * 2^0 = 1000 (calculated before increment)
+      // First retry: 1000 * 2^0 = 1000 ±25% jitter (calculated before increment)
       actor.send({ type: 'RETRY' });
-      expect(actor.getSnapshot().context.backoffDelay).to.equal(1000);
+      expect(actor.getSnapshot().context.backoffDelay).to.be.within(750, 1250);
       expect(actor.getSnapshot().context.retryCount).to.equal(1);
 
       // Move to reconnecting, then fail again
       actor.send({ type: 'RETRY' }); // backoff → reconnecting
       actor.send({ type: 'FAILURE', error: 'fail again' });
 
-      // Second retry: 1000 * 2^1 = 2000
+      // Second retry: 1000 * 2^1 = 2000 ±25% jitter
       actor.send({ type: 'RETRY' });
-      expect(actor.getSnapshot().context.backoffDelay).to.equal(2000);
+      expect(actor.getSnapshot().context.backoffDelay).to.be.within(1500, 2500);
       expect(actor.getSnapshot().context.retryCount).to.equal(2);
     });
 

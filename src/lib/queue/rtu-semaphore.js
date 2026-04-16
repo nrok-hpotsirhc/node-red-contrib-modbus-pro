@@ -161,29 +161,22 @@ class RtuSemaphore extends EventEmitter {
       item.reject(new Error('RtuSemaphore: semaphore drained'));
     }
 
-    // Wait for any current operation to finish (up to timeout)
+    // Wait for any current operation to finish (event-based, no polling)
     if (this._busy) {
       await new Promise((resolve) => {
-        let resolved = false;
-        const timer = setTimeout(() => {
-          if (!resolved) {
-            resolved = true;
-            resolve();
-          }
-        }, this._timeout);
+        const timer = setTimeout(resolve, this._timeout);
 
-        const check = () => {
-          if (!this._busy) {
-            if (!resolved) {
-              resolved = true;
-              clearTimeout(timer);
-              resolve();
-            }
-          } else {
-            setTimeout(check, 10);
-          }
+        const done = () => {
+          clearTimeout(timer);
+          this.removeListener('complete', done);
+          this.removeListener('timeout', done);
+          this.removeListener('error', done);
+          resolve();
         };
-        check();
+
+        this.once('complete', done);
+        this.once('timeout', done);
+        this.once('error', done);
       });
     }
 

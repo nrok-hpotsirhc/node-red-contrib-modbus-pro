@@ -17,7 +17,8 @@ const DEFAULT_CONTEXT = {
   lastError: null,
   queue: [],
   maxQueueSize: 100,
-  currentRequest: null
+  currentRequest: null,
+  onStatusChange: null
 };
 
 /**
@@ -33,6 +34,10 @@ const DEFAULT_CONTEXT = {
  * Events:
  *   CONNECT, DISCONNECT, READ_REQUEST, WRITE_REQUEST,
  *   SUCCESS, FAILURE, TIMEOUT, RETRY
+ *
+ * Status notifications are delivered via the optional onStatusChange callback
+ * passed in the actor input. Consumers can also use actor.subscribe() to
+ * observe state transitions directly.
  */
 const connectionMachine = setup({
   types: {
@@ -54,7 +59,9 @@ const connectionMachine = setup({
     hasRetriesLeft: guards.hasRetriesLeft,
     isQueueNotFull: guards.isQueueNotFull,
     isValidRequest: guards.isValidRequest,
-    hasQueuedRequests: ({ context }) => context.queue.length > 0
+    hasQueuedRequests: ({ context }) => context.queue.length > 0,
+    canEnqueue: ({ context, event }) =>
+      guards.isValidRequest({ event }) && guards.isQueueNotFull({ context })
   },
   actions: {
     incrementRetry: actions.incrementRetry,
@@ -66,40 +73,11 @@ const connectionMachine = setup({
     clearCurrentRequest: actions.clearCurrentRequest,
     calculateBackoff: actions.calculateBackoff,
     storeTransport: actions.storeTransport,
-    notifyConnect: ({ context, self }) => {
-      self.system && self.system.emit && self.system.emit('status', {
-        state: 'connected',
-        fill: 'green',
-        shape: 'dot',
-        text: 'Connected'
-      });
-    },
-    notifyDisconnect: ({ context, self }) => {
-      self.system && self.system.emit && self.system.emit('status', {
-        state: 'disconnected',
-        fill: 'red',
-        shape: 'dot',
-        text: 'Disconnected'
-      });
-    },
-    notifyError: ({ context, self }) => {
-      self.system && self.system.emit && self.system.emit('status', {
-        state: 'error',
-        fill: 'red',
-        shape: 'ring',
-        text: `Error: ${context.lastError || 'Unknown'}`
-      });
-    },
-    notifyBackoff: ({ context, self }) => {
-      self.system && self.system.emit && self.system.emit('status', {
-        state: 'backoff',
-        fill: 'yellow',
-        shape: 'ring',
-        text: `Reconnecting in ${context.backoffDelay}ms (${context.retryCount}/${context.maxRetries})`
-      });
-    },
-    notifyReading: () => {},
-    notifyWriting: () => {}
+    notifyStatus: ({ context }, params) => {
+      if (typeof context.onStatusChange === 'function') {
+        context.onStatusChange(params);
+      }
+    }
   }
 }).createMachine({
   id: 'modbusConnection',
@@ -110,7 +88,10 @@ const connectionMachine = setup({
   }),
   states: {
     disconnected: {
-      entry: ['notifyDisconnect'],
+      entry: [{
+        type: 'notifyStatus',
+        params: { state: 'disconnected', fill: 'red', shape: 'dot', text: 'Disconnected' }
+      }],
       on: {
         CONNECT: {
           target: 'connecting',
@@ -140,7 +121,10 @@ const connectionMachine = setup({
     },
 
     connected: {
-      entry: ['notifyConnect'],
+      entry: [{
+        type: 'notifyStatus',
+        params: { state: 'connected', fill: 'green', shape: 'dot', text: 'Connected' }
+      }],
       on: {
         READ_REQUEST: [
           {
@@ -168,7 +152,6 @@ const connectionMachine = setup({
     },
 
     reading: {
-      entry: ['notifyReading'],
       on: {
         SUCCESS: [
           {
@@ -194,18 +177,17 @@ const connectionMachine = setup({
           actions: ['clearCurrentRequest']
         },
         READ_REQUEST: {
-          guard: 'isValidRequest',
+          guard: 'canEnqueue',
           actions: ['enqueueRequest']
         },
         WRITE_REQUEST: {
-          guard: 'isValidRequest',
+          guard: 'canEnqueue',
           actions: ['enqueueRequest']
         }
       }
     },
 
     writing: {
-      entry: ['notifyWriting'],
       on: {
         SUCCESS: [
           {
@@ -231,18 +213,27 @@ const connectionMachine = setup({
           actions: ['clearCurrentRequest']
         },
         READ_REQUEST: {
-          guard: 'isValidRequest',
+          guard: 'canEnqueue',
           actions: ['enqueueRequest']
         },
         WRITE_REQUEST: {
-          guard: 'isValidRequest',
+          guard: 'canEnqueue',
           actions: ['enqueueRequest']
         }
       }
     },
 
     error: {
-      entry: ['notifyError'],
+      entry: [({ context }) => {
+        if (typeof context.onStatusChange === 'function') {
+          context.onStatusChange({
+            state: 'error',
+            fill: 'red',
+            shape: 'ring',
+            text: `Error: ${context.lastError || 'Unknown'}`
+          });
+        }
+      }],
       on: {
         RETRY: [
           {
@@ -265,7 +256,16 @@ const connectionMachine = setup({
     },
 
     backoff: {
-      entry: ['notifyBackoff'],
+      entry: [({ context }) => {
+        if (typeof context.onStatusChange === 'function') {
+          context.onStatusChange({
+            state: 'backoff',
+            fill: 'yellow',
+            shape: 'ring',
+            text: `Reconnecting in ${context.backoffDelay}ms (${context.retryCount}/${context.maxRetries})`
+          });
+        }
+      }],
       on: {
         RETRY: {
           target: 'reconnecting'
