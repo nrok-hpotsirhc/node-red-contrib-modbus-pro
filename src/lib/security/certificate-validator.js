@@ -248,7 +248,12 @@ class CertificateValidator {
       }
       crypto.createPrivateKey(keyOptions);
     } catch (err) {
-      if (err.message.includes('passphrase') || err.message.includes('decrypt')) {
+      const msg = err.message.toLowerCase();
+      const code = (err.code || '').toLowerCase();
+      if (msg.includes('passphrase') || msg.includes('decrypt') ||
+          msg.includes('interrupted') || msg.includes('cancelled') ||
+          code.includes('interrupted') || code.includes('cancelled') ||
+          (pem.includes(PEM_KEY_HEADER_ENCRYPTED) && !passphrase)) {
         errors.push('Private key is encrypted – passphrase required or incorrect');
       } else {
         errors.push(`Invalid private key: ${err.message}`);

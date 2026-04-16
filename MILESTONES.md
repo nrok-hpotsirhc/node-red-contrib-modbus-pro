@@ -16,7 +16,7 @@
 | MS-4 | Client/Master – Write Nodes & Queue | [x] Complete | WP 2.2, WP 2.3 | FC 05/06/15/16, backpressure |
 | MS-5 | Server/Slave – Proxy Architecture | [x] Complete | WP 3.1, WP 3.2, WP 3.3 | TCP/RTU listener, Modbus-In/Out nodes |
 | MS-6 | Server Caching & Optimization | [x] Complete | WP 3.4 | In-memory hashmap, performance |
-| MS-7 | Modbus/TCP Security | [ ] Open | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
+| MS-7 | Modbus/TCP Security | [x] Complete | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
 | MS-8 | Quality Assurance & Release | [ ] Open | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | Testing, docs, npm publish |
 
 ---
@@ -189,12 +189,12 @@
 - **WP 4.3** – Build process for credential separation
 
 **Deliverables:**
-- [ ] `src/lib/security/tls-wrapper.js` – TLS socket creation
-- [ ] `src/lib/security/certificate-validator.js` – X.509v3 validation, RBAC extraction
-- [ ] Config node HTML extension for TLS fields (credential type)
-- [ ] `test/unit/security/tls-wrapper.test.js`
-- [ ] `test/unit/security/certificate-validator.test.js`
-- [ ] `test/fixtures/certs/` – Test certificates (self-signed, documented)
+- [x] `src/lib/security/tls-wrapper.js` – TLS socket creation
+- [x] `src/lib/security/certificate-validator.js` – X.509v3 validation, RBAC extraction
+- [x] Config node HTML extension for TLS fields (credential type)
+- [x] `test/unit/security/tls-wrapper.test.js`
+- [x] `test/unit/security/certificate-validator.test.js`
+- [x] `test/fixtures/certs/` – Test certificates (self-signed, documented)
 
 **Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §5 Modbus/TCP Security](docs/THEORETICAL_FOUNDATIONS.md#5-modbustcp-security-protocol)
 
@@ -245,5 +245,5 @@
 | 2026-04-16 | MS-4 | Complete | Write nodes, backpressure queue (334 passing) |
 | 2026-04-16 | MS-5 | Complete | Server proxy architecture, Modbus-In/Out nodes (366 passing) |
 | 2026-04-16 | MS-6 | Complete | Register cache with TTL, write invalidation (437 passing) |
-| _TBD_ | MS-7 | Open | — |
+| 2026-04-16 | MS-7 | Complete | TLS wrapper, certificate validator, mTLS, credential UI (532 passing) |
 | _TBD_ | MS-8 | Open | — |

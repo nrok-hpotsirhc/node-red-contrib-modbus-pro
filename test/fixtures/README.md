@@ -19,7 +19,17 @@ test/fixtures/
 ### certs/
 | File | Description | Used In | Last Updated | Removable? |
 |------|-------------|---------|-------------|------------|
-| _empty_ | Will be populated in MS-7 (WP 4.1–4.3) | — | — | — |
+| `ca-cert.pem` | Self-signed CA certificate (RSA 2048, 10 years, CN=TestCA) | `test/unit/security/*.test.js` | 2026-04-16 | no – CA root for all test certs |
+| `ca-key.pem` | CA private key (RSA 2048) | `test/unit/security/*.test.js` | 2026-04-16 | no – signs server/client certs |
+| `server-cert.pem` | Server certificate signed by CA (CN=localhost, SAN=localhost,127.0.0.1) | `test/unit/security/tls-wrapper.test.js` | 2026-04-16 | no – TLS server identity in integration tests |
+| `server-key.pem` | Server private key (RSA 2048) | `test/unit/security/tls-wrapper.test.js` | 2026-04-16 | no – TLS server key |
+| `client-cert.pem` | Client certificate signed by CA (CN=TestClient, OU=ModbusOperator) | `test/unit/security/*.test.js` | 2026-04-16 | no – mTLS client auth and RBAC tests |
+| `client-key.pem` | Client private key (RSA 2048) | `test/unit/security/*.test.js` | 2026-04-16 | no – mTLS client key |
+| `client-key-encrypted.pem` | Client private key encrypted with AES-256 (passphrase: testpass123) | `test/unit/security/certificate-validator.test.js` | 2026-04-16 | no – passphrase validation tests |
+| `untrusted-cert.pem` | Self-signed certificate NOT signed by CA (CN=untrusted) | `test/unit/security/tls-wrapper.test.js` | 2026-04-16 | no – negative test for untrusted certs |
+| `untrusted-key.pem` | Private key for untrusted certificate | `test/unit/security/tls-wrapper.test.js` | 2026-04-16 | no – pairs with untrusted-cert |
+| `expired-cert.pem` | Short-lived certificate for expiry tests (1 day validity) | `test/unit/security/certificate-validator.test.js` | 2026-04-16 | no – expiry detection tests |
+| `expired-key.pem` | Private key for expired certificate | `test/unit/security/certificate-validator.test.js` | 2026-04-16 | no – pairs with expired-cert |
 ---
 ## Guidelines
 1. **Every new fixture file** must be registered in the table above
