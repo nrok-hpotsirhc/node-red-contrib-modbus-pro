@@ -155,7 +155,7 @@ leaves the status stale is considered incomplete.
 
 ## 6. Work Package and Milestone References
 
-The implementation follows the **Work Breakdown Structure** from [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md), grouped into 8 milestones (see [MILESTONES.md](MILESTONES.md)):
+The implementation follows the **Work Breakdown Structure** from [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md), grouped into 12 milestones (see [MILESTONES.md](MILESTONES.md)):
 
 | Milestone | Focus | Work Packages | Status |
 |-----------|-------|---------------|--------|
@@ -167,6 +167,10 @@ The implementation follows the **Work Breakdown Structure** from [docs/WORK_PACK
 | MS-6 | Server Caching & Optimization | WP 3.4 | [x] Complete |
 | MS-7 | Modbus/TCP Security | WP 4.1, WP 4.2, WP 4.3 | [x] Complete |
 | MS-8 | QA, Documentation & Release | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | [~] In Progress |
+| MS-9 | High-Priority Extended FCs | WP 6.1, WP 6.2 | [ ] Open |
+| MS-10 | Serial Diagnostics & Legacy FCs | WP 6.3, WP 6.4 | [ ] Open |
+| MS-11 | Fieldbus Architecture Extensions | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | [ ] Open |
+| MS-12 | Advanced Fieldbus Nodes | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | [ ] Open |
 
 ### Session Workflow per Milestone:
 1. Read MILESTONES.md → check current status
@@ -186,8 +190,8 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 
 - **Modbus addressing:** Zero-based on the bus, one-based in datasheets. Register 40108 → offset 107, FC 03.
 - **Endianness:** Modbus transmits big-endian. Float32 across 2 registers → word order is device-dependent.
-- **Function codes:** FC 01-04 (Read), FC 05/06 (Write Single), FC 15/16 (Write Multiple). Max payload 240 bytes.
-- **RTU vs. TCP:** RTU is half-duplex (semaphore required), TCP is full-duplex (connection pool possible).
+- **Function codes:** FC 01-04 (Read), FC 05/06 (Write Single), FC 15/16 (Write Multiple), FC 22 (Mask Write), FC 23 (Read/Write), FC 43/14 (Device ID). Max PDU payload 253 bytes → auto-chunking required for large reads.
+- **RTU vs. TCP:** RTU is half-duplex (semaphore required), TCP is full-duplex (connection pool possible). RTU-over-TCP is a third variant used by many gateways.
 - **Security:** TLS 1.3 over port 802, mTLS with X.509v3, credentials in the Node-RED Credential Store.
 
 ---
@@ -205,6 +209,7 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 | Next open deliverable | Leak tests for partial deploys (WP 5.2) |
 | Open items | `examples/flows/`, README.md, npm publish config, `npm pack` validation |
 | Known issues | None – all bugs from Code Review #4 resolved |
+| Planned (MS-9–12) | 8 new WPs, 13 missing FCs documented, 4 fieldbus extensions planned |
 
 ### MS-8 Deliverable Checklist
 - [x] 532/532 tests passing, all security certificate fixtures generated

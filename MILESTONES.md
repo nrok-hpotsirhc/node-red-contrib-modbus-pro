@@ -18,6 +18,10 @@
 | MS-6 | Server Caching & Optimization | [x] Complete | WP 3.4 | In-memory hashmap, performance |
 | MS-7 | Modbus/TCP Security | [x] Complete | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
 | MS-8 | Quality Assurance & Release | [~] In Progress | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | Testing, docs, npm publish |
+| MS-9 | High-Priority Extended FCs | [ ] Open | WP 6.1, WP 6.2 | FC 22/23, FC 43/14 Device Identification |
+| MS-10 | Serial Diagnostics & Legacy FCs | [ ] Open | WP 6.3, WP 6.4 | FC 07/08 diagnostics, FC 11/12/17/20/21/24 |
+| MS-11 | Fieldbus Architecture Extensions | [ ] Open | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | Chunking, data types, exceptions, RTU-TCP |
+| MS-12 | Advanced Fieldbus Nodes | [ ] Open | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | RBE, scanner, watchdog, stats |
 
 ---
 
@@ -238,6 +242,133 @@
 
 ---
 
+## MS-9: High-Priority Extended Function Codes
+
+**Goal:** Close the gap between the 8 implemented FCs and the most industrially relevant
+missing FCs before the v1.0 release. FC 22 and FC 23 eliminate race conditions; FC 43/14
+enables automated device discovery.
+
+**Work Packages:**
+- **WP 6.1** – FC 22 (Mask Write Register) + FC 23 (Read/Write Multiple Registers)
+- **WP 6.2** – FC 43/14 (Read Device Identification)
+
+**Deliverables:**
+- [ ] `src/nodes/client/modbus-write.js` – FC 22 / FC 23 added
+- [ ] `src/nodes/client/modbus-write.html` – UI additions for FC 22/23
+- [ ] `test/integration/modbus-write-extended.test.js` – FC 22/23 test scenarios
+- [ ] `src/nodes/client/modbus-discover.js` – new Modbus-Discover node
+- [ ] `src/nodes/client/modbus-discover.html`
+- [ ] `test/integration/modbus-discover.test.js`
+
+**Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §3 Complete FC table](docs/THEORETICAL_FOUNDATIONS.md#3-the-modbus-data-model)
+
+**Acceptance Criteria:**
+- FC 22 performs atomic AND/OR mask write on a holding register
+- FC 23 combines write + read in a single PDU with correct round-trip latency
+- `modbus-discover` returns device identification object map from compliant devices
+- Streaming mode supported for extended object lists (FC 43/14)
+
+---
+
+## MS-10: Serial Diagnostics and Legacy Function Codes
+
+**Goal:** Complete serial-line diagnostic coverage for RTU environments; add file/FIFO
+access for legacy PLC file systems. Primarily relevant for brownfield RTU deployments.
+
+**Work Packages:**
+- **WP 6.3** – FC 08 (Diagnostics) + FC 07 (Read Exception Status)
+- **WP 6.4** – FC 11, 12, 17, 20, 21, 24
+
+**Deliverables:**
+- [ ] `src/nodes/client/modbus-diagnostic.js` – new node (FC 07, FC 08, FC 11, FC 12, FC 17)
+- [ ] `src/nodes/client/modbus-diagnostic.html`
+- [ ] `test/integration/modbus-diagnostic.test.js`
+- [ ] `src/nodes/client/modbus-file.js` – new node (FC 20, FC 21, FC 24)
+- [ ] `src/nodes/client/modbus-file.html`
+- [ ] `test/integration/modbus-file.test.js`
+
+**Theoretical Foundations:** See [THEORETICAL_FOUNDATIONS.md §3 Complete FC table](docs/THEORETICAL_FOUNDATIONS.md#3-the-modbus-data-model)
+
+**Acceptance Criteria:**
+- FC 08/0x00 loopback echo test works on RTU bus
+- FC 08 sub-function counter reads return numeric values
+- FC 07 returns 8-bit exception status word
+- FC 11/12/17 return structured diagnostic data
+- FC 20/21 read/write file records on a compliant device
+- FC 24 reads FIFO queue contents
+
+---
+
+## MS-11: Fieldbus Architecture Extensions
+
+**Goal:** Harden the core architecture for production-grade industrial deployments:
+automatic request splitting, extended data types, structured exception codes, and
+RTU-over-TCP gateway support.
+
+**Work Packages:**
+- **WP 7.1** – Automatic request chunking + broadcast (Unit ID 0)
+- **WP 7.2** – Extended data type abstraction (Double, Int64, String, BCD, DateTime)
+- **WP 7.3** – Modbus exception code structured error handling
+- **WP 7.4** – Modbus RTU over TCP transport
+
+**Deliverables:**
+- [ ] `src/lib/transport/request-chunker.js` – auto-split and reassemble large requests
+- [ ] `test/unit/transport/request-chunker.test.js`
+- [ ] `src/lib/parser/buffer-parser.js` – Float64, Int64/UInt64, String, BCD, DateTime
+- [ ] `src/lib/parser/exception-parser.js` – structured exception code mapping
+- [ ] `test/unit/parser/exception-parser.test.js`
+- [ ] `src/lib/transport/rtu-over-tcp-transport.js` – RTU-over-TCP transport type
+- [ ] `src/nodes/config/modbus-client-config.js` – RTU-over-TCP config option
+- [ ] `test/unit/transport/rtu-over-tcp-transport.test.js`
+
+**Theoretical Foundations:**
+- [THEORETICAL_FOUNDATIONS.md §3 Complete FC table](docs/THEORETICAL_FOUNDATIONS.md#3-the-modbus-data-model)
+- [THEORETICAL_FOUNDATIONS.md §4 Endianness](docs/THEORETICAL_FOUNDATIONS.md#4-endianness-in-javascript)
+
+**Acceptance Criteria:**
+- A read request for 300 registers is automatically split into 3 sequential requests
+- Broadcast (Unit ID 0) write completes without timeout error
+- Float64 and Int64 values correctly reconstructed from 4 consecutive registers
+- Modbus exception response surfaces as `msg.payload.exception.code` and `msg.payload.exception.name`
+- RTU-over-TCP transport connects to gateway devices using raw RTU framing
+
+---
+
+## MS-12: Advanced Fieldbus Nodes
+
+**Goal:** Provide the higher-level operational nodes that distinguish an enterprise-grade
+SCADA driver from a basic protocol adapter: change detection, scan scheduling, safe-state
+watchdog, and runtime metrics.
+
+**Work Packages:**
+- **WP 7.5** – Report-by-Exception (RBE) node
+- **WP 7.6** – Scan-list / Polling-Scheduler node
+- **WP 7.7** – Watchdog / Safe-State Heartbeat node
+- **WP 7.8** – Statistics and Diagnostics Runtime node
+
+**Deliverables:**
+- [ ] `src/nodes/client/modbus-rbe.js` – dead-band and change-detection node
+- [ ] `src/nodes/client/modbus-rbe.html`
+- [ ] `test/unit/client/modbus-rbe.test.js`
+- [ ] `src/nodes/client/modbus-scanner.js` – multi-rate polling scan-list node
+- [ ] `src/nodes/client/modbus-scanner.html`
+- [ ] `test/integration/modbus-scanner.test.js`
+- [ ] `src/nodes/client/modbus-watchdog.js` – safe-state heartbeat node
+- [ ] `src/nodes/client/modbus-watchdog.html`
+- [ ] `test/unit/client/modbus-watchdog.test.js`
+- [ ] `src/nodes/client/modbus-stats.js` – runtime metrics node
+- [ ] `src/nodes/client/modbus-stats.html`
+- [ ] `test/unit/client/modbus-stats.test.js`
+- [ ] `package.json` – register all 4 new nodes
+
+**Acceptance Criteria:**
+- `modbus-rbe` passes only changed values downstream with configurable dead-band
+- `modbus-scanner` supports at least 3 independent scan groups with different intervals
+- `modbus-watchdog` sends safe-state write within 2× heartbeat interval after connection loss
+- `modbus-stats` emits `requestsTotal`, `avgResponseTimeMs`, `queueDepth`, `reconnectCount`
+
+---
+
 ## Progress Log
 
 | Date | Milestone | Status | Notes |
@@ -250,3 +381,4 @@
 | 2026-04-16 | MS-6 | Complete | Register cache with TTL, write invalidation (437 passing) |
 | 2026-04-16 | MS-7 | Complete | TLS wrapper, certificate validator, mTLS, credential UI (532 passing) |
 | 2026-04-17 | MS-8 | In Progress | Code Review #4: 9 fixes (LIFO double-done, TLS disconnect, destroy leak, timer cleanup, stopServer timeout, DRY parseIntSafe, poll throttle, unref timer, test cert generation). 532/532 tests passing |
+| 2026-04-17 | MS-9 – MS-12 | Planned | FC gap analysis: 13 missing FCs identified; 8 new WPs (6.1–7.8) and 4 new milestones (MS-9–MS-12) added to planning documents |

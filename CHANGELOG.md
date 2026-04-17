@@ -9,6 +9,27 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Documentation
+- **FC Gap Analysis & Roadmap Planning (MS-9–MS-12)**
+  - Conducted complete gap analysis against the Modbus Application Protocol Specification V1.1b3: 8 of 21 function codes were already implemented (FC 01–06, 15, 16); 13 function codes are now planned in 4 new milestones
+  - Updated `docs/THEORETICAL_FOUNDATIONS.md` §3 with a complete FC status table (✅ Implemented / 🔲 Planned / ⬜ Out of scope) and detailed descriptions of all planned FCs
+  - Added **WP 6** (Extended Function Codes) with 4 sub-packages:
+    - WP 6.1: FC 22 (Mask Write Register) + FC 23 (Read/Write Multiple Registers) → MS-9
+    - WP 6.2: FC 43/14 (Read Device Identification) → MS-9
+    - WP 6.3: FC 08 (Diagnostics) + FC 07 (Read Exception Status) → MS-10
+    - WP 6.4: FC 11, 12, 17 (serial diagnostics) + FC 20, 21, 24 (file/FIFO) → MS-10
+  - Added **WP 7** (Fieldbus Specialist Extensions) with 4 sub-packages:
+    - WP 7.1: Automatic request chunking + broadcast (Unit ID 0) → MS-11
+    - WP 7.2: Extended data types (Float64, Int64, String, BCD, DateTime) → MS-11
+    - WP 7.3: Structured Modbus exception code handling (0x01–0x0B) → MS-11
+    - WP 7.4: RTU-over-TCP transport for industrial gateways → MS-11
+    - WP 7.5: Report-by-Exception (RBE) dedicated node → MS-12
+    - WP 7.6: Scan-list / Polling-Scheduler node → MS-12
+    - WP 7.7: Watchdog / Safe-State Heartbeat node → MS-12
+    - WP 7.8: Statistics and Diagnostics Runtime node → MS-12
+  - Added 4 new milestones (MS-9–MS-12) to `MILESTONES.md`
+  - Updated `agents.md` §6 milestone table and §9 status snapshot
+
 ### Changed
 - **Code Review #4: Security, Robustness & Code Quality**
   - Fix double `done()` call in `modbus-write.js` LIFO drop: drop event handler now only calls `done()` for FIFO drops (old items). LIFO drops are handled by the current input handler, preventing Node-RED message tracking corruption
