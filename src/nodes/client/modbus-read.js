@@ -165,14 +165,20 @@ module.exports = function (RED) {
 
     // Start interval-based polling if configured
     if (node.pollInterval > 0) {
+      node._lastPollError = null;
       node._pollTimer = setInterval(function () {
         doRead(null).then(function (outMsg) {
           if (outMsg) {
+            node._lastPollError = null;
             node.send(outMsg);
           }
         }).catch(function (err) {
           node.status({ fill: 'red', shape: 'ring', text: `Error: ${err.message}` });
-          node.error(`Modbus Read: ${err.message}`);
+          // Throttle repeated identical errors to avoid flooding the log
+          if (node._lastPollError !== err.message) {
+            node._lastPollError = err.message;
+            node.error(`Modbus Read: ${err.message}`);
+          }
         });
       }, node.pollInterval);
       node.log(`Modbus Read: Polling every ${node.pollInterval}ms (FC ${node.fc} @ ${node._protocolAddress})`);

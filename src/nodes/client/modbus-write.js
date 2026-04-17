@@ -90,8 +90,9 @@ module.exports = function (RED) {
 
     node._queue.on('drop', function (info) {
       node.warn(`Modbus Write: Queue overflow – ${info.reason} (queue: ${info.queueLength}/${node.queueMaxSize})`);
-      // Call done() on the dropped entry to release Node-RED message tracking resources
-      if (info.item && typeof info.item.done === 'function') {
+      // Only call done() for FIFO drops (old items whose input handler already returned).
+      // LIFO drops are the current message – done() is called by the input handler.
+      if (info.reason === 'fifo_overflow' && info.item && typeof info.item.done === 'function') {
         info.item.done(new Error(`Modbus Write: message dropped (${info.reason})`));
       }
     });

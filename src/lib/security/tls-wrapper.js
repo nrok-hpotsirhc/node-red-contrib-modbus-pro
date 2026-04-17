@@ -314,16 +314,23 @@ class TlsWrapper extends EventEmitter {
       const socket = this._socket;
       this._socket = null;
 
-      socket.once('close', () => resolve());
-      socket.end();
-
-      // Force destroy after DESTROY_TIMEOUT if graceful close doesn't complete
-      setTimeout(() => {
-        if (!socket.destroyed) {
-          socket.destroy();
+      let settled = false;
+      const destroyTimer = setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          if (!socket.destroyed) socket.destroy();
+          resolve();
         }
-        resolve();
       }, DESTROY_TIMEOUT);
+
+      socket.once('close', () => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(destroyTimer);
+          resolve();
+        }
+      });
+      socket.end();
     });
   }
 

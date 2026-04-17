@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- **Code Review #4: Security, Robustness & Code Quality**
+  - Fix double `done()` call in `modbus-write.js` LIFO drop: drop event handler now only calls `done()` for FIFO drops (old items). LIFO drops are handled by the current input handler, preventing Node-RED message tracking corruption
+  - Fix `tls-wrapper.js` `disconnect()` double-resolve: added `settled` guard and `clearTimeout` to prevent timeout from firing after socket close event, eliminating redundant `socket.destroy()` on already-closed sockets
+  - Fix `base-transport.js` `destroy()` resource leak: wrap `disconnect()` call in try/catch so `removeAllListeners()` always runs even if disconnect throws, preventing listener accumulation
+  - Fix `modbus-in.js` and `modbus-out.js` timer leak: track `setTimeout` handles for status-reset and clear them on node close, preventing "not a function" errors after node removal
+  - Add timeout protection to `modbus-server-config.js` `stopServer()`: 10s safety timer ensures the promise resolves even if `server.close()` callback never fires; try/catch around close calls prevents unhandled exceptions during shutdown
+  - Extract shared `parseIntSafe()` utility to `src/lib/utils.js` (DRY): remove duplicate implementations from `modbus-client-config.js` and `modbus-server-config.js`
+  - Add polling error throttle in `modbus-read.js`: repeated identical errors during interval polling are logged only once, preventing log flooding when transport is down
+  - Add `timer.unref()` to `rtu-semaphore.js` inter-frame delay timer: prevents the timer from keeping the Node.js process alive during shutdown
+  - Generate missing test certificate fixtures (`test/fixtures/certs/`): CA, server (with SAN), client (with OU=ModbusOperator), encrypted key (AES-256), untrusted cert, expired cert – via `generate-certs.js` script. Fixes 35 previously failing security tests (532/532 now passing)
+
 ### Added
 - **MS-7: Modbus/TCP Security**
   - `src/lib/security/certificate-validator.js` – X.509v3 certificate validator for Modbus/TCP Security. Validates PEM-encoded certificates and private keys, checks expiry with configurable warning threshold, verifies cert/key pair matching, extracts RBAC roles from X.509v3 OU fields. Supports encrypted private keys with passphrase. Used by both client and server config nodes.

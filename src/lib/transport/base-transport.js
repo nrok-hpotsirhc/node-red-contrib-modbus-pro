@@ -218,7 +218,11 @@ class BaseTransport extends EventEmitter {
    * @returns {Promise<void>}
    */
   async destroy() {
-    await this.disconnect();
+    try {
+      await this.disconnect();
+    } catch (_err) {
+      // Ignore close errors during destroy – cleanup must complete
+    }
     this._client.removeAllListeners();
     this.removeAllListeners();
   }

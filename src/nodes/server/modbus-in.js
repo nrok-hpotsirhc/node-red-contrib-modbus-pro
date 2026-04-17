@@ -58,6 +58,9 @@ module.exports = function (RED) {
 
     node.status({ fill: 'grey', shape: 'dot', text: 'Waiting for server...' });
 
+    // Track pending status-reset timers for cleanup
+    node._statusTimers = [];
+
     /**
      * Handle incoming Modbus request events from the server config node.
      * @param {object} request - The Modbus request payload.
@@ -108,11 +111,13 @@ module.exports = function (RED) {
       node.send(msg);
 
       // Reset status after a short delay
-      setTimeout(function () {
+      const timer = setTimeout(function () {
+        node._statusTimers = node._statusTimers.filter(function (t) { return t !== timer; });
         if (node.server && node.server._started) {
           node.status({ fill: 'green', shape: 'dot', text: 'Listening' });
         }
       }, 200);
+      node._statusTimers.push(timer);
     }
 
     /**
@@ -138,6 +143,11 @@ module.exports = function (RED) {
 
     // Cleanup on close
     node.on('close', function (done) {
+      // Clear any pending status-reset timers
+      if (node._statusTimers) {
+        node._statusTimers.forEach(clearTimeout);
+        node._statusTimers = [];
+      }
       if (node.server && node.server._requestEmitter) {
         node.server._requestEmitter.removeListener('modbusRequest', onModbusRequest);
         node.server._requestEmitter.removeListener('serverStatus', onServerStatus);

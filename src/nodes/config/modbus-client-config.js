@@ -2,19 +2,7 @@
 
 const TransportFactory = require('../../lib/transport/transport-factory');
 const { CertificateValidator } = require('../../lib/security/certificate-validator');
-
-/**
- * Parse a string to an integer, returning the default value
- * if the result is not a finite number. Unlike `parseInt(x) || default`,
- * this correctly handles 0 as a valid value (e.g. unitId 0 for TCP broadcast).
- * @param {*} value - Value to parse.
- * @param {number} defaultValue - Fallback if parsing fails.
- * @returns {number}
- */
-function parseIntSafe(value, defaultValue) {
-  const parsed = parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : defaultValue;
-}
+const { parseIntSafe } = require('../../lib/utils');
 
 /**
  * Modbus Client Config node for Node-RED.

@@ -142,7 +142,8 @@ class RtuSemaphore extends EventEmitter {
    */
   _scheduleNext() {
     if (this._queue.length > 0 && !this._draining) {
-      setTimeout(() => this._processNext(), this._interFrameDelay);
+      const timer = setTimeout(() => this._processNext(), this._interFrameDelay);
+      if (timer.unref) timer.unref();
     }
   }
 

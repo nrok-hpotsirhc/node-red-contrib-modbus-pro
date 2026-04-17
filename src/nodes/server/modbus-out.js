@@ -35,6 +35,22 @@ module.exports = function (RED) {
 
     node.status({ fill: 'grey', shape: 'dot', text: 'Ready' });
 
+    // Track pending status-reset timers for cleanup
+    node._statusTimers = [];
+
+    /**
+     * Schedule a status reset and track the timer for cleanup.
+     * @private
+     */
+    function scheduleStatusReset() {
+      const timer = setTimeout(function () {
+        node._statusTimers = node._statusTimers.filter(function (t) { return t !== timer; });
+        node._lastStatus = 'idle';
+        node.status({ fill: 'green', shape: 'dot', text: 'Ready' });
+      }, 200);
+      node._statusTimers.push(timer);
+    }
+
     /**
      * Handle server status change events.
      * @param {object} status - The status object { fill, shape, text }.
@@ -89,10 +105,7 @@ module.exports = function (RED) {
           node.warn(`Modbus Out: Request ${requestId} not found (timeout or already resolved)`);
         }
 
-        setTimeout(function () {
-          node._lastStatus = 'idle';
-          node.status({ fill: 'green', shape: 'dot', text: 'Ready' });
-        }, 200);
+        scheduleStatusReset();
 
         done();
         return;
@@ -122,10 +135,7 @@ module.exports = function (RED) {
       }
 
       // Reset status after a short delay
-      setTimeout(function () {
-        node._lastStatus = 'idle';
-        node.status({ fill: 'green', shape: 'dot', text: 'Ready' });
-      }, 200);
+      scheduleStatusReset();
 
       // Forward the message for chaining
       send(msg);
@@ -134,6 +144,11 @@ module.exports = function (RED) {
 
     // Cleanup on close
     node.on('close', function (done) {
+      // Clear any pending status-reset timers
+      if (node._statusTimers) {
+        node._statusTimers.forEach(clearTimeout);
+        node._statusTimers = [];
+      }
       if (node.server && node.server._requestEmitter) {
         node.server._requestEmitter.removeListener('serverStatus', onServerStatus);
       }

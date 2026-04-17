@@ -7,20 +7,9 @@ const ModbusRTU = require('modbus-serial');
 const crypto = require('crypto');
 const { RegisterCache } = require('../../lib/cache/register-cache');
 const { CertificateValidator } = require('../../lib/security/certificate-validator');
+const { parseIntSafe } = require('../../lib/utils');
 
 const ServerTCP = ModbusRTU.ServerTCP;
-
-/**
- * Parse a string to an integer, returning the default value
- * if the result is not a finite number.
- * @param {*} value - Value to parse.
- * @param {number} defaultValue - Fallback if parsing fails.
- * @returns {number}
- */
-function parseIntSafe(value, defaultValue) {
-  const parsed = parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : defaultValue;
-}
 
 /**
  * Map function code numbers to human-readable request type names.
@@ -410,12 +399,26 @@ module.exports = function (RED) {
         }
         node._pendingRequests.clear();
 
+        // Safety timeout – resolve after 10s even if close callbacks hang
+        const safetyTimer = setTimeout(function () {
+          node.warn('Server stop: close callback timed out, forcing shutdown');
+          node._server = null;
+          node._tlsServer = null;
+          node._started = false;
+          resolve();
+        }, 10000);
+
         const closeModbusServer = function (next) {
           if (node._server) {
-            node._server.close(function () {
+            try {
+              node._server.close(function () {
+                node._server = null;
+                next();
+              });
+            } catch (_err) {
               node._server = null;
               next();
-            });
+            }
           } else {
             next();
           }
@@ -423,10 +426,15 @@ module.exports = function (RED) {
 
         const closeTlsServer = function (next) {
           if (node._tlsServer) {
-            node._tlsServer.close(function () {
+            try {
+              node._tlsServer.close(function () {
+                node._tlsServer = null;
+                next();
+              });
+            } catch (_err) {
               node._tlsServer = null;
               next();
-            });
+            }
           } else {
             next();
           }
@@ -434,6 +442,7 @@ module.exports = function (RED) {
 
         closeModbusServer(function () {
           closeTlsServer(function () {
+            clearTimeout(safetyTimer);
             node._started = false;
             resolve();
           });

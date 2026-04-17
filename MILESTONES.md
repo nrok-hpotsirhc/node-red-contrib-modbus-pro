@@ -17,7 +17,7 @@
 | MS-5 | Server/Slave – Proxy Architecture | [x] Complete | WP 3.1, WP 3.2, WP 3.3 | TCP/RTU listener, Modbus-In/Out nodes |
 | MS-6 | Server Caching & Optimization | [x] Complete | WP 3.4 | In-memory hashmap, performance |
 | MS-7 | Modbus/TCP Security | [x] Complete | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
-| MS-8 | Quality Assurance & Release | [ ] Open | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | Testing, docs, npm publish |
+| MS-8 | Quality Assurance & Release | [~] In Progress | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | Testing, docs, npm publish |
 
 ---
 
@@ -218,7 +218,10 @@
 - **WP 5.4** – License compliance, npm registry, Node-RED Flow Library
 
 **Deliverables:**
-- [ ] Complete test suite with >80% coverage
+- [x] Complete test suite with >80% coverage – 532/532 tests passing, all security tests fixed
+- [x] Code Review #4: 9 bug fixes and improvements (see CHANGELOG.md)
+- [x] Test certificate fixtures generated (`test/fixtures/certs/generate-certs.js`)
+- [x] Shared utility extracted (`src/lib/utils.js`) – DRY improvement
 - [ ] Leak tests verified for partial deploys
 - [ ] Node-RED help sidebar texts for all nodes
 - [ ] `examples/flows/` with examples (watchdog, RBE filter, bitwise stuffing)
@@ -246,4 +249,4 @@
 | 2026-04-16 | MS-5 | Complete | Server proxy architecture, Modbus-In/Out nodes (366 passing) |
 | 2026-04-16 | MS-6 | Complete | Register cache with TTL, write invalidation (437 passing) |
 | 2026-04-16 | MS-7 | Complete | TLS wrapper, certificate validator, mTLS, credential UI (532 passing) |
-| _TBD_ | MS-8 | Open | — |
+| 2026-04-17 | MS-8 | In Progress | Code Review #4: 9 fixes (LIFO double-done, TLS disconnect, destroy leak, timer cleanup, stopServer timeout, DRY parseIntSafe, poll throttle, unref timer, test cert generation). 532/532 tests passing |
