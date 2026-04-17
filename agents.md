@@ -109,9 +109,10 @@ node-red-contrib-modbus-pro/
 | `MILESTONES.md` – Deliverables | Check off `[x]` each completed deliverable |
 | `MILESTONES.md` – Progress Log | Add a new row with date, milestone, status, and a brief note including test count |
 | `agents.md` – §9 Current Status | Update the status snapshot (test count, open items, last session date) |
+| `README.md` – Development Progress | Update milestone table (✅/🔄/🔲), current state description, test badge, overall progress line |
 | `CHANGELOG.md` | Add an entry under `[Unreleased]` describing what changed |
 
-**Rule:** No session ends without all five files reflecting the actual state. A session that
+**Rule:** No session ends without all six files reflecting the actual state. A session that
 leaves the status stale is considered incomplete.
 
 ### 4.2 Coding Standards

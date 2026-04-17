@@ -5,13 +5,14 @@
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Node-RED](https://img.shields.io/badge/Platform-Node--RED-red.svg)](https://nodered.org)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org)
-[![Status](https://img.shields.io/badge/Status-In%20Development-orange.svg)](#development-progress)
+[![Status](https://img.shields.io/badge/Status-MS--8%20In%20Progress-orange.svg)](#development-progress)
+[![Tests](https://img.shields.io/badge/Tests-532%20passing-brightgreen.svg)](#development-progress)
 
 ---
 
 ## Development Progress
 
-> **Current State:** Core framework, client nodes, server proxy, and caching complete – security layer next.
+> **Current State (2026-04-17):** MS-7 complete – TLS 1.3, mTLS, X.509v3 security layer fully implemented and tested. 532/532 tests passing. MS-8 (QA & Release) in progress.
 
 | # | Milestone | Status | Progress |
 |---|-----------|--------|----------|
@@ -21,10 +22,10 @@
 | MS-4 | Client/Master – Write Nodes & Queue | ✅ Complete | `██████████` 100 % |
 | MS-5 | Server/Slave – Proxy Architecture | ✅ Complete | `██████████` 100 % |
 | MS-6 | Server Caching & Optimization | ✅ Complete | `██████████` 100 % |
-| MS-7 | Modbus/TCP Security | 🔲 Open | `░░░░░░░░░░` 0 % |
-| MS-8 | Quality Assurance & Release | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-7 | Modbus/TCP Security | ✅ Complete | `██████████` 100 % |
+| MS-8 | Quality Assurance & Release | 🔄 In Progress | `████░░░░░░` 40 % |
 
-**Overall Progress: 6 / 8 milestones completed**
+**Overall Progress: 7 / 8 milestones completed – 532 / 532 tests passing**
 
 > Milestone details: [MILESTONES.md](MILESTONES.md) · Work packages: [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md)
 
