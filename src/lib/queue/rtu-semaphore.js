@@ -28,6 +28,7 @@ class RtuSemaphore extends EventEmitter {
     this._completedCount = 0;
     this._droppedCount = 0;
     this._draining = false;
+    this._scheduleTimer = null;
   }
 
   /**
@@ -142,8 +143,11 @@ class RtuSemaphore extends EventEmitter {
    */
   _scheduleNext() {
     if (this._queue.length > 0 && !this._draining) {
-      const timer = setTimeout(() => this._processNext(), this._interFrameDelay);
-      if (timer.unref) timer.unref();
+      this._scheduleTimer = setTimeout(() => {
+        this._scheduleTimer = null;
+        this._processNext();
+      }, this._interFrameDelay);
+      if (this._scheduleTimer.unref) this._scheduleTimer.unref();
     }
   }
 
@@ -154,6 +158,12 @@ class RtuSemaphore extends EventEmitter {
    */
   async drain() {
     this._draining = true;
+
+    // Cancel any scheduled inter-frame timer so drain finishes promptly.
+    if (this._scheduleTimer) {
+      clearTimeout(this._scheduleTimer);
+      this._scheduleTimer = null;
+    }
 
     // Reject all pending items in the queue
     while (this._queue.length > 0) {

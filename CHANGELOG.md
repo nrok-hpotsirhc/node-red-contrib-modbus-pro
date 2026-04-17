@@ -9,6 +9,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed (Code Review Pass)
+- **modbus-server-config:** Added `setCoilArray` (FC 15) and `setRegisterArray` (FC 16) to the modbus-serial vector so multi-write requests are proxied as a single `modbusRequest` event with the full array payload, and cache invalidation receives the correct `count`. Previously FC 15/16 fell back to per-address loops.
+- **state-machine/guards:** `isValidRequest` now enforces `address ≤ 0xFFFF` (upper bound) and requires an integer `length` between 1 and 2000; it also rejects empty `operation` strings. Prevents malformed requests from reaching the transport.
+- **state-machine/connection-machine:** `createConnectionActor` now normalizes `baseDelay`, `maxDelay`, `maxRetries`, and `maxQueueSize`. If `baseDelay > maxDelay`, the values are swapped to preserve meaningful exponential backoff.
+- **tcp-transport:** `connect()` now destroys the TLS wrapper when `connectTCP` fails, preventing a leaked `TlsWrapper` instance on reconnect attempts.
+- **rtu-semaphore:** The inter-frame timer is now tracked as `_scheduleTimer` and cleared in `drain()`, allowing clean shutdown without a dangling pending timer.
+- **modbus-read:** `pollInterval` is now clamped to `(0, 86400000]`. Negative or non-finite values (previously accepted by `parseInt`) are rejected with a warning and polling is disabled. Switched to `parseIntSafe` for all numeric config parsing to correctly handle `0`.
+
 ### Documentation
 - **Theoretical Foundations Expansion (§12–§17) for MS-9–MS-12**
   - Added §12: Extended Function Codes – PDU Structure and Protocol Behavior

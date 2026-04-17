@@ -102,6 +102,14 @@ class TcpTransport extends BaseTransport {
       this.emit('connect');
     } catch (err) {
       this._connected = false;
+      // Release the TLS wrapper so a subsequent reconnect starts clean.
+      // Swallow cleanup errors – they must not mask the original connect error.
+      if (this._tlsWrapper) {
+        try {
+          await this._tlsWrapper.destroy();
+        } catch (_cleanupErr) { /* ignore */ }
+        this._tlsWrapper = null;
+      }
       this.emit('error', err);
       throw err;
     }

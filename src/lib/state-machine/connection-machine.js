@@ -321,8 +321,35 @@ const connectionMachine = setup({
  * @returns {import('xstate').Actor}
  */
 function createConnectionActor(options = {}) {
+  const merged = { ...options };
+
+  // Validate numeric options to prevent degenerate backoff / queue behavior.
+  // Invalid values fall back to defaults with a silent normalization – we
+  // cannot console.warn here because the actor may be used in tests.
+  if (typeof merged.baseDelay === 'number' && (!Number.isFinite(merged.baseDelay) || merged.baseDelay < 0)) {
+    merged.baseDelay = undefined;
+  }
+  if (typeof merged.maxDelay === 'number' && (!Number.isFinite(merged.maxDelay) || merged.maxDelay < 0)) {
+    merged.maxDelay = undefined;
+  }
+  const effBase = merged.baseDelay !== undefined ? merged.baseDelay : DEFAULT_CONTEXT.baseDelay;
+  const effMax = merged.maxDelay !== undefined ? merged.maxDelay : DEFAULT_CONTEXT.maxDelay;
+  if (effBase > effMax) {
+    // Swap to keep exponential backoff meaningful.
+    merged.baseDelay = effMax;
+    merged.maxDelay = effBase;
+  }
+  if (typeof merged.maxRetries === 'number' &&
+      (!Number.isInteger(merged.maxRetries) || merged.maxRetries < 0)) {
+    merged.maxRetries = DEFAULT_CONTEXT.maxRetries;
+  }
+  if (typeof merged.maxQueueSize === 'number' &&
+      (!Number.isInteger(merged.maxQueueSize) || merged.maxQueueSize < 1)) {
+    merged.maxQueueSize = DEFAULT_CONTEXT.maxQueueSize;
+  }
+
   return createActor(connectionMachine, {
-    input: options
+    input: merged
   });
 }
 

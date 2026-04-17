@@ -283,6 +283,14 @@ module.exports = function (RED) {
         // FC 06 – Write Single Register (3-arg → promise style)
         setRegister: function (address, value, unitID) {
           return handleRequest(6, address, value, unitID);
+        },
+        // FC 15 – Write Multiple Coils (3-arg → promise style, receives boolean array)
+        setCoilArray: function (address, values, unitID) {
+          return handleRequest(15, address, values, unitID);
+        },
+        // FC 16 – Write Multiple Registers (3-arg → promise style, receives register array)
+        setRegisterArray: function (address, values, unitID) {
+          return handleRequest(16, address, values, unitID);
         }
       };
     }

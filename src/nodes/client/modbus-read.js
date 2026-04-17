@@ -49,13 +49,21 @@ module.exports = function (RED) {
     // Retrieve the config node
     node.server = RED.nodes.getNode(config.server);
 
+    const { parseIntSafe } = require('../../lib/utils');
+
     // Store configuration
     node.name = config.name || '';
-    node.fc = parseInt(config.fc, 10) || 3;
-    node.address = parseInt(config.address, 10) || 0;
-    node.quantity = parseInt(config.quantity, 10) || 1;
+    node.fc = parseIntSafe(config.fc, 3);
+    node.address = parseIntSafe(config.address, 0);
+    node.quantity = parseIntSafe(config.quantity, 1);
     node.addressOffset = config.addressOffset === 'one-based' ? 'one-based' : 'zero-based';
-    node.pollInterval = parseInt(config.pollInterval, 10) || 0;
+    const rawPoll = parseIntSafe(config.pollInterval, 0);
+    // Clamp pollInterval: negative / non-finite values are coerced to 0 (trigger-only).
+    // Upper bound (24h) prevents accidental overflow from misconfigured flows.
+    node.pollInterval = rawPoll > 0 && rawPoll <= 86400000 ? rawPoll : 0;
+    if (rawPoll < 0 || rawPoll > 86400000) {
+      node.warn(`Modbus Read: pollInterval out of range (${rawPoll}ms), disabling polling`);
+    }
 
     // Compute the effective zero-based address for the protocol
     node._protocolAddress = node.addressOffset === 'one-based'

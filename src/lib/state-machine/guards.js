@@ -48,10 +48,16 @@ function isQueueNotFull({ context }) {
 function isValidRequest({ event }) {
   if (!event || !event.request) return false;
   const req = event.request;
-  if (typeof req.operation !== 'string') return false;
-  if (typeof req.address !== 'number' || !Number.isFinite(req.address) || req.address < 0) return false;
-  // Read operations need length, write operations need value(s)
-  const hasLength = typeof req.length === 'number' && req.length > 0;
+  if (typeof req.operation !== 'string' || req.operation.length === 0) return false;
+  // Modbus addressable range is 0x0000..0xFFFF (65535).
+  if (typeof req.address !== 'number' || !Number.isInteger(req.address) ||
+      req.address < 0 || req.address > 0xFFFF) return false;
+  // Read operations need length, write operations need value(s).
+  // Max length per spec: 2000 coils (FC 01/02) or 125 registers (FC 03/04);
+  // use the wider bound here because the guard is FC-agnostic. Strict FC
+  // limits are enforced by the transport / modbus-serial layer.
+  const hasLength = typeof req.length === 'number' && Number.isInteger(req.length) &&
+                    req.length > 0 && req.length <= 2000;
   const hasValue = req.value !== undefined || req.values !== undefined;
   return hasLength || hasValue;
 }
