@@ -218,6 +218,7 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 - [x] Extended base-transport (3 new methods), payload-builder (2 new builders)
 - [x] 81 new tests (unit + integration), 646/646 total passing
 - [x] Node registered in package.json (7 nodes total)
+- [x] Code Review #6 – 4 bugs fixed (parseIntSafe in modbus-write + modbus-discover, FC 23 null guard, 16-bit range validation in buffer-parser)
 
 ### MS-8 Deliverable Checklist
 - [x] 565/565 tests passing, all security certificate fixtures generated

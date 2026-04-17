@@ -46,6 +46,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   - All nodes now include: status indicator tables, error behavior sections, and Modbus specification references
 
 ### Fixed (Code Review Pass)
+- **Code Review #6 – 4 bugs fixed (2026-04-18):**
+  - `src/nodes/client/modbus-write.js`: Replaced `parseInt(x, 10) || default` with `parseIntSafe(x, default)` for all config fields (`fc`, `address`, `queueMaxSize`, `readAddress`, `readQuantity`). The previous pattern incorrectly coerced `0` to the default value, causing broadcast unit ID and zero-address configurations to silently use defaults. (Category D – DRY/consistency)
+  - `src/nodes/client/modbus-discover.js`: Replaced `parseInt(x, 10) || default` with `parseIntSafe()` for both config fields (`deviceIdCode`, `objectId`) and dynamic `msg.deviceIdCode` / `msg.objectId` overrides, ensuring consistent fallback to the node's configured value when an invalid override is supplied. (Category D – DRY/consistency)
+  - `src/nodes/client/modbus-write.js` (FC 23 branch): Added explicit null/shape guard on the `readWriteRegisters` transport response (`!result || !Array.isArray(result.data)` throws a descriptive error) to prevent `TypeError: Cannot read properties of undefined (reading 'data')` if the transport returns a malformed or empty response. (Category B – Robustness)
+  - `src/lib/parser/buffer-parser.js`: Strengthened `_validateRegisterPair()` to validate that each register value is a finite integer within the 16-bit unsigned range `[0, 65535]`. Previously only the `typeof === 'number'` check was performed, allowing `NaN`, `Infinity`, negative values, and out-of-range floats to silently pass through to `Buffer` writes where they would produce undefined output. `TypeError` is retained for non-number inputs; `RangeError` is thrown for out-of-range values. (Category A/B – Input validation)
+
+### Fixed (Previous Code Review Passes)
 - **modbus-server-config:** Added `setCoilArray` (FC 15) and `setRegisterArray` (FC 16) to the modbus-serial vector so multi-write requests are proxied as a single `modbusRequest` event with the full array payload, and cache invalidation receives the correct `count`. Previously FC 15/16 fell back to per-address loops.
 - **state-machine/guards:** `isValidRequest` now enforces `address ≤ 0xFFFF` (upper bound) and requires an integer `length` between 1 and 2000; it also rejects empty `operation` strings. Prevents malformed requests from reaching the transport.
 - **state-machine/connection-machine:** `createConnectionActor` now normalizes `baseDelay`, `maxDelay`, `maxRetries`, and `maxQueueSize`. If `baseDelay > maxDelay`, the values are swapped to preserve meaningful exponential backoff.
