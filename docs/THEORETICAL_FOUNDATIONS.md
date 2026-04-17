@@ -126,26 +126,69 @@ One of the most common error sources in Modbus integration:
 
 > An architecturally mature Node-RED node must make this offset mapping transparent or support the user through clear UI validation.
 
-### Standardized Function Codes (FC)
+### Standardized Function Codes (FC) – Complete Specification Overview
 
-| FC (Dec) | FC (Hex) | Function | Target Table | Action |
-|----------|----------|----------|--------------|--------|
-| 01 | 0x01 | Read Coils | Coils | Reads up to 2000 outputs |
-| 02 | 0x02 | Read Discrete Inputs | Discrete Inputs | Reads inputs for HMI/SCADA |
-| 03 | 0x03 | Read Holding Registers | Holding Registers | Reads parameters/setpoints |
-| 04 | 0x04 | Read Input Registers | Input Registers | Reads analog measurements |
-| 05 | 0x05 | Write Single Coil | Coils | Sets a single output |
-| 06 | 0x06 | Write Single Register | Holding Registers | Writes a 16-bit value |
-| 15 | 0x0F | Write Multiple Coils | Coils | Writes bit sequences |
-| 16 | 0x10 | Write Multiple Registers | Holding Registers | Writes register blocks |
+The table below lists **all function codes** defined in the Modbus Application Protocol Specification
+V1.1b3. The **Status** column reflects the implementation state of this project.
 
-**Extended Function Codes (optional):**
-- FC 08 (0x08): Diagnostics – serial line testing
-- FC 43 (0x2B): Read Device Identification – automated device discovery
+| FC (Dec) | FC (Hex) | Function | Transport | Status |
+|----------|----------|----------|-----------|--------|
+| 01 | 0x01 | Read Coils | TCP + RTU | ✅ Implemented |
+| 02 | 0x02 | Read Discrete Inputs | TCP + RTU | ✅ Implemented |
+| 03 | 0x03 | Read Holding Registers | TCP + RTU | ✅ Implemented |
+| 04 | 0x04 | Read Input Registers | TCP + RTU | ✅ Implemented |
+| 05 | 0x05 | Write Single Coil | TCP + RTU | ✅ Implemented |
+| 06 | 0x06 | Write Single Register | TCP + RTU | ✅ Implemented |
+| 07 | 0x07 | Read Exception Status | RTU only | 🔲 Planned – WP 6.3 |
+| 08 | 0x08 | Diagnostics (sub-functions 0x00–0x12) | RTU only | 🔲 Planned – WP 6.3 |
+| 11 | 0x0B | Get Comm Event Counter | RTU only | 🔲 Planned – WP 6.4 |
+| 12 | 0x0C | Get Comm Event Log | RTU only | 🔲 Planned – WP 6.4 |
+| 15 | 0x0F | Write Multiple Coils | TCP + RTU | ✅ Implemented |
+| 16 | 0x10 | Write Multiple Registers | TCP + RTU | ✅ Implemented |
+| 17 | 0x11 | Report Server ID | RTU only | 🔲 Planned – WP 6.4 |
+| 20 | 0x14 | Read File Record | TCP + RTU | 🔲 Planned – WP 6.4 |
+| 21 | 0x15 | Write File Record | TCP + RTU | 🔲 Planned – WP 6.4 |
+| 22 | 0x16 | Mask Write Register | TCP + RTU | 🔲 Planned – WP 6.1 |
+| 23 | 0x17 | Read/Write Multiple Registers | TCP + RTU | 🔲 Planned – WP 6.1 |
+| 24 | 0x18 | Read FIFO Queue | TCP + RTU | 🔲 Planned – WP 6.4 |
+| 43/13 | 0x2B/0x0D | CANopen General Reference | TCP + RTU | ⬜ Out of scope |
+| 43/14 | 0x2B/0x0E | Read Device Identification | TCP + RTU | 🔲 Planned – WP 6.2 |
 
-**Payload Limitation:** The Modbus specification limits the payload to 240 bytes, meaning a maximum of ~120 registers (16 bits each) per read request. Larger data sets require chunking across multiple sequential requests.
+**Legend:** ✅ Implemented · 🔲 Planned · ⬜ Out of scope
 
-> **Source:** Modbus Application Protocol Specification V1.1b3, Chapter 6 [REF-01]
+### Function Code Details for Planned Extensions
+
+**FC 22 – Mask Write Register (0x16)**  
+Performs an atomic AND/OR bit-mask operation on a single holding register without a
+separate read-modify-write cycle. This eliminates race conditions in multi-master
+environments and is widely used in PLC programming to set or clear individual control bits.
+Formula: `result = (current_value AND andMask) OR (orMask AND NOT andMask)`
+
+**FC 23 – Read/Write Multiple Registers (0x17)**  
+Combines a write (FC 16) and a read (FC 03) in a single Modbus transaction. Reduces
+round-trip latency in PLC setpoint-feedback loops and guarantees that the read reflects
+the state after the write.
+
+**FC 43/14 – Read Device Identification (0x2B/0x0E)**  
+Reads standardized object identifiers (vendor name, product code, major/minor revision,
+user-defined objects). Essential for automated device discovery in IIoT asset management
+and SCADA inventory systems. Supports streaming mode for large object lists.
+
+**FC 08 – Diagnostics (0x08)**  
+Serial-line only. Sub-function 0x00 (Return Query Data) is the Modbus loopback test.
+Further sub-functions read or reset the communication event counter, CRC error counter,
+and bus exception counters. Indispensable for RTU commissioning and maintenance.
+
+**FC 07 – Read Exception Status (0x07)**  
+Serial-line only. Reads 8 coil-like status bits from a device-defined register.
+Common use: PLC alarm summary word.
+
+**Payload Limitation:** The Modbus specification limits the PDU payload to 253 bytes
+(PDU = 1 byte FC + up to 252 bytes data). This means a maximum of 125 holding registers
+(FC 03) or 2000 coils (FC 01) per single request. Larger data sets require automatic
+chunking across multiple sequential requests – see [WP 7.1](WORK_PACKAGES.md#wp-71-automatic-request-chunking-and-broadcast-support).
+
+> **Source:** Modbus Application Protocol Specification V1.1b3, Chapters 6 and 7 [REF-01]
 
 ---
 
