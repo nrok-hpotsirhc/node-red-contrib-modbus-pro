@@ -112,12 +112,26 @@ module.exports = function (RED) {
 
     /**
      * Create a transport instance via the factory.
-     * Does NOT connect – connection lifecycle is managed in MS-2.
      *
      * @returns {import('../../lib/transport/tcp-transport')|import('../../lib/transport/rtu-transport')}
      */
     node.createTransport = function () {
       return TransportFactory.create(node.getTransportConfig());
+    };
+
+    /**
+     * Return an open transport, creating and connecting it on demand.
+     *
+     * @returns {Promise<import('../../lib/transport/tcp-transport')|import('../../lib/transport/rtu-transport')>}
+     */
+    node.getConnectedTransport = async function () {
+      if (!node._transport) {
+        node._transport = node.createTransport();
+      }
+      if (!node._transport.isOpen()) {
+        await node._transport.connect();
+      }
+      return node._transport;
     };
 
     /**

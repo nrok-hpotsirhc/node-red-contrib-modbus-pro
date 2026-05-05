@@ -88,7 +88,7 @@ class RtuTransport extends BaseTransport {
         'RtuTransport: serialport package is not installed. ' +
         'RTU transport is unavailable. Install with: npm install serialport'
       );
-      this.emit('error', err);
+      this._emitError(err);
       throw err;
     }
 
@@ -105,7 +105,7 @@ class RtuTransport extends BaseTransport {
       this.emit('connect');
     } catch (err) {
       this._connected = false;
-      this.emit('error', err);
+      this._emitError(err);
       throw err;
     }
   }

@@ -78,6 +78,7 @@ module.exports = function (RED) {
       // Validate payload
       if (!payload || typeof payload !== 'object') {
         node.status({ fill: 'red', shape: 'ring', text: 'Invalid payload' });
+        scheduleStatusReset();
         done(new Error('Modbus Out: msg.payload must be an object with requestId and data'));
         return;
       }
@@ -85,6 +86,7 @@ module.exports = function (RED) {
       const requestId = payload.requestId;
       if (!requestId || typeof requestId !== 'string') {
         node.status({ fill: 'red', shape: 'ring', text: 'Missing requestId' });
+        scheduleStatusReset();
         done(new Error('Modbus Out: msg.payload.requestId is required (from modbus-in)'));
         return;
       }
@@ -115,6 +117,7 @@ module.exports = function (RED) {
       const data = payload.data;
       if (data === undefined || data === null) {
         node.status({ fill: 'red', shape: 'ring', text: 'Missing data' });
+        scheduleStatusReset();
         done(new Error('Modbus Out: msg.payload.data is required'));
         return;
       }

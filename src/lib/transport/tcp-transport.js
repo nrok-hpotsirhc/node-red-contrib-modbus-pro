@@ -110,7 +110,7 @@ class TcpTransport extends BaseTransport {
         } catch (_cleanupErr) { /* ignore */ }
         this._tlsWrapper = null;
       }
-      this.emit('error', err);
+      this._emitError(err);
       throw err;
     }
   }
