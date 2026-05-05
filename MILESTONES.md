@@ -19,9 +19,9 @@
 | MS-7 | Modbus/TCP Security | [x] Complete | WP 4.1, WP 4.2, WP 4.3 | TLS 1.3, mTLS, credential management |
 | MS-8 | Quality Assurance & Release | [x] Complete | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | Testing, docs, npm publish – v0.1.0 released |
 | MS-9 | High-Priority Extended FCs | [x] Complete | WP 6.1, WP 6.2 | FC 22/23, FC 43/14 Device Identification |
-| MS-10 | Serial Diagnostics & Legacy FCs | [ ] Open | WP 6.3, WP 6.4 | FC 07/08 diagnostics, FC 11/12/17/20/21/24 |
-| MS-11 | Fieldbus Architecture Extensions | [ ] Open | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | Chunking, data types, exceptions, RTU-TCP |
-| MS-12 | Advanced Fieldbus Nodes | [ ] Open | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | RBE, scanner, watchdog, stats |
+| MS-10 | Serial Diagnostics & Legacy FCs | [x] Complete | WP 6.3, WP 6.4 | FC 07/08 diagnostics, FC 11/12/17/20/21/24 |
+| MS-11 | Fieldbus Architecture Extensions | [x] Complete | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | Chunking, data types, exceptions, RTU-TCP |
+| MS-12 | Advanced Fieldbus Nodes | [x] Complete | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | RBE, scanner, watchdog, stats |
 
 ---
 
@@ -285,12 +285,12 @@ access for legacy PLC file systems. Primarily relevant for brownfield RTU deploy
 - **WP 6.4** – FC 11, 12, 17, 20, 21, 24
 
 **Deliverables:**
-- [ ] `src/nodes/client/modbus-diagnostic.js` – new node (FC 07, FC 08, FC 11, FC 12, FC 17)
-- [ ] `src/nodes/client/modbus-diagnostic.html`
-- [ ] `test/integration/modbus-diagnostic.test.js`
-- [ ] `src/nodes/client/modbus-file.js` – new node (FC 20, FC 21, FC 24)
-- [ ] `src/nodes/client/modbus-file.html`
-- [ ] `test/integration/modbus-file.test.js`
+- [x] `src/nodes/client/modbus-diagnostic.js` – new node (FC 07, FC 08, FC 11, FC 12, FC 17)
+- [x] `src/nodes/client/modbus-diagnostic.html`
+- [x] `test/integration/modbus-diagnostic.test.js`
+- [x] `src/nodes/client/modbus-file.js` – new node (FC 20, FC 21, FC 24)
+- [x] `src/nodes/client/modbus-file.html`
+- [x] `test/integration/modbus-file.test.js`
 
 **Theoretical Foundations:**
 - [THEORETICAL_FOUNDATIONS.md §12.4 FC 07 – Read Exception Status](docs/THEORETICAL_FOUNDATIONS.md#124-fc-07--read-exception-status-0x07)
@@ -324,14 +324,14 @@ RTU-over-TCP gateway support.
 - **WP 7.4** – Modbus RTU over TCP transport
 
 **Deliverables:**
-- [ ] `src/lib/transport/request-chunker.js` – auto-split and reassemble large requests
-- [ ] `test/unit/transport/request-chunker.test.js`
-- [ ] `src/lib/parser/buffer-parser.js` – Float64, Int64/UInt64, String, BCD, DateTime
-- [ ] `src/lib/parser/exception-parser.js` – structured exception code mapping
-- [ ] `test/unit/parser/exception-parser.test.js`
-- [ ] `src/lib/transport/rtu-over-tcp-transport.js` – RTU-over-TCP transport type
-- [ ] `src/nodes/config/modbus-client-config.js` – RTU-over-TCP config option
-- [ ] `test/unit/transport/rtu-over-tcp-transport.test.js`
+- [x] `src/lib/transport/request-chunker.js` – auto-split and reassemble large requests
+- [x] `test/unit/transport/request-chunker.test.js`
+- [x] `src/lib/parser/buffer-parser.js` – Float64, Int64/UInt64, String, BCD, DateTime
+- [x] `src/lib/parser/exception-parser.js` – structured exception code mapping
+- [x] `test/unit/parser/exception-parser.test.js`
+- [x] `src/lib/transport/rtu-over-tcp-transport.js` – RTU-over-TCP transport type
+- [x] `src/nodes/config/modbus-client-config.js` – RTU-over-TCP config option
+- [x] `test/unit/transport/rtu-over-tcp-transport.test.js`
 
 **Theoretical Foundations:**
 - [THEORETICAL_FOUNDATIONS.md §13 Modbus Exception Responses](docs/THEORETICAL_FOUNDATIONS.md#13-modbus-exception-responses)
@@ -361,19 +361,19 @@ watchdog, and runtime metrics.
 - **WP 7.8** – Statistics and Diagnostics Runtime node
 
 **Deliverables:**
-- [ ] `src/nodes/client/modbus-rbe.js` – dead-band and change-detection node
-- [ ] `src/nodes/client/modbus-rbe.html`
-- [ ] `test/unit/client/modbus-rbe.test.js`
-- [ ] `src/nodes/client/modbus-scanner.js` – multi-rate polling scan-list node
-- [ ] `src/nodes/client/modbus-scanner.html`
-- [ ] `test/integration/modbus-scanner.test.js`
-- [ ] `src/nodes/client/modbus-watchdog.js` – safe-state heartbeat node
-- [ ] `src/nodes/client/modbus-watchdog.html`
-- [ ] `test/unit/client/modbus-watchdog.test.js`
-- [ ] `src/nodes/client/modbus-stats.js` – runtime metrics node
-- [ ] `src/nodes/client/modbus-stats.html`
-- [ ] `test/unit/client/modbus-stats.test.js`
-- [ ] `package.json` – register all 4 new nodes
+- [x] `src/nodes/client/modbus-rbe.js` – dead-band and change-detection node
+- [x] `src/nodes/client/modbus-rbe.html`
+- [x] `test/unit/client/modbus-rbe.test.js`
+- [x] `src/nodes/client/modbus-scanner.js` – multi-rate polling scan-list node
+- [x] `src/nodes/client/modbus-scanner.html`
+- [x] `test/unit/client/modbus-scanner.test.js`
+- [x] `src/nodes/client/modbus-watchdog.js` – safe-state heartbeat node
+- [x] `src/nodes/client/modbus-watchdog.html`
+- [x] `test/unit/client/modbus-watchdog.test.js`
+- [x] `src/nodes/client/modbus-stats.js` – runtime metrics node
+- [x] `src/nodes/client/modbus-stats.html`
+- [x] `test/unit/client/modbus-stats.test.js`
+- [x] `package.json` – register all 4 new nodes
 
 **Theoretical Foundations:**
 - [THEORETICAL_FOUNDATIONS.md §17.1 Report-by-Exception (RBE)](docs/THEORETICAL_FOUNDATIONS.md#171-report-by-exception-rbe-and-dead-band-filtering)
@@ -411,3 +411,6 @@ watchdog, and runtime metrics.
 | 2026-04-17 | MS-8 | Complete | CHANGELOG.md finalized: [Unreleased] → [0.1.0] – 2026-04-17. All WP 5.1–5.4 deliverables complete. v0.1.0 ready for npm publish. 646/646 tests passing |
 | 2026-05-05 | MS-9 | Complete | Finalization audit: lint config, deterministic generated TLS cert fixtures, client transport auto-connect, status transition hardening, UI parsing cleanup. 646/646 tests passing; lint passing; npm pack dry run passing |
 | 2026-05-05 | Post-audit | Complete | Code review follow-up: removed BOM from `src/index.js`; added `.unref()` to status timers (modbus-in, modbus-out), `stopServer` safety timer, and `RtuSemaphore.drain` wait timer for clean Node.js shutdown. 646/646 tests passing; lint passing |
+| 2026-05-05 | MS-11 | Complete | Fieldbus architecture extensions: `exception-parser.js` (structured Modbus exception codes, 23 unit tests), `request-chunker.js` (auto-chunking + Unit ID 0 broadcast, 23 unit tests), extended `buffer-parser.js` (Float64, Int64/UInt64 BigInt, String, BCD, Unix timestamp, 28 unit tests), `rtu-over-tcp-transport.js` + factory + client-config integration (12 unit tests). 732/732 tests passing |
+| 2026-05-05 | MS-10 | Complete | Serial diagnostics & legacy FCs: BaseTransport extended with FC 07/08/11/12/17/20/21/24 wrappers and safe parsers; `modbus-diagnostic` node (FC 07/08/11/12/17, 10 integration tests); `modbus-file` node (FC 20/21/24, 7 integration tests). 752/752 tests passing |
+| 2026-05-05 | MS-12 | Complete | Advanced fieldbus nodes: `modbus-rbe` (dead-band + state change, 10 unit tests), `modbus-scanner` (multi-rate scan groups, 8 unit tests), `modbus-watchdog` (safe-state heartbeat with restore, 7 unit tests), `modbus-stats` (request/error/percentile-latency metrics via transparent transport hooks, 5 unit tests). 11 nodes total registered. 785/785 tests passing; lint clean |

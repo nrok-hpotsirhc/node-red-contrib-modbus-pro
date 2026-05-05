@@ -168,9 +168,9 @@ The implementation follows the **Work Breakdown Structure** from [docs/WORK_PACK
 | MS-7 | Modbus/TCP Security | WP 4.1, WP 4.2, WP 4.3 | [x] Complete |
 | MS-8 | QA, Documentation & Release | WP 5.1, WP 5.2, WP 5.3, WP 5.4 | [x] Complete |
 | MS-9 | High-Priority Extended FCs | WP 6.1, WP 6.2 | [x] Complete |
-| MS-10 | Serial Diagnostics & Legacy FCs | WP 6.3, WP 6.4 | [ ] Open |
-| MS-11 | Fieldbus Architecture Extensions | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | [ ] Open |
-| MS-12 | Advanced Fieldbus Nodes | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | [ ] Open |
+| MS-10 | Serial Diagnostics & Legacy FCs | WP 6.3, WP 6.4 | [x] Complete |
+| MS-11 | Fieldbus Architecture Extensions | WP 7.1, WP 7.2, WP 7.3, WP 7.4 | [x] Complete |
+| MS-12 | Advanced Fieldbus Nodes | WP 7.5, WP 7.6, WP 7.7, WP 7.8 | [x] Complete |
 
 ### Session Workflow per Milestone:
 1. Read MILESTONES.md → check current status
@@ -204,12 +204,30 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 | Field | Value |
 |-------|-------|
 | Last updated | 2026-05-05 |
-| Test suite | 646 / 646 passing; lint passing |
-| Active milestone | MS-10 – Serial Diagnostics & Legacy FCs (next open) |
-| Next open deliverable | WP 6.3 – FC 08 (Diagnostics) + FC 07 (Read Exception Status) |
-| Open items | None – v0.1.0 ready for npm publish; finalization audit + post-audit cleanup complete |
+| Test suite | 785 / 785 passing; lint passing |
+| Active milestone | All 12 milestones complete – v0.2.0 candidate |
+| Next open deliverable | None – feature-complete; awaiting release validation |
+| Open items | Run release validation (`npm pack` size review, regenerate cert fixtures, smoke-deploy in Node-RED) |
 | Known issues | None |
-| Planned (MS-10–12) | 6 WPs, 10 missing FCs, 4 fieldbus extensions – theoretical foundations (§12–§17) complete |
+| Roadmap | 11 nodes total: client-config, server-config, modbus-read, modbus-write, modbus-discover, modbus-diagnostic, modbus-file, modbus-rbe, modbus-scanner, modbus-watchdog, modbus-stats, modbus-in, modbus-out |
+
+### MS-12 Deliverable Checklist (Complete)
+- [x] WP 7.5 – `modbus-rbe` node: absolute / percentage / boolean dead-band, inhibit time, msg.reset support (10 tests)
+- [x] WP 7.6 – `modbus-scanner` node: multi-group polling scheduler with overlap suppression, start/stop/trigger/stats commands (8 tests)
+- [x] WP 7.7 – `modbus-watchdog` node: heartbeat write, latched safe-state on failure, optional restore-on-reconnect (7 tests)
+- [x] WP 7.8 – `modbus-stats` node: transparent transport hooks, p50/p95/p99 latency, FC + exception histograms (5 tests)
+- [x] All 4 nodes registered in package.json
+
+### MS-11 Deliverable Checklist (Complete)
+- [x] WP 7.3 – `exception-parser.js` (codes 1–11 + gateway 0x0A/0x0B with structured `{ isException, code, name, message }`)
+- [x] WP 7.1 – `request-chunker.js` (auto-split for FC 1/2 max 2000, FC 3/4 max 125, FC 15 max 1968, FC 16 max 123; broadcast unitId 0)
+- [x] WP 7.2 – `buffer-parser.js` extended (Float64 BE/LE/BE_BS/LE_BS, Int64/UInt64 as BigInt, ASCII string with NUL trim, BCD encode/decode, Unix-32-bit timestamp)
+- [x] WP 7.4 – `rtu-over-tcp-transport.js` + factory + `connectionType: 'rtu-over-tcp'` in client config
+
+### MS-10 Deliverable Checklist (Complete)
+- [x] WP 6.3 – `modbus-diagnostic` node: FC 07/08/11/12/17 via BaseTransport extensions
+- [x] WP 6.4 – `modbus-file` node: FC 20/21/24 with strict sub-request validation and tolerant response parser (`_parseFileRecordResponse` handles both spec layouts)
+- [x] BaseTransport: 8 new helpers wrapping `customFunction()` for legacy FCs; private validators (`_validateFileSubRequests`, `_parseFileRecordResponse`, `_parseFileRecordSubResponses`)
 
 ### MS-9 Deliverable Checklist (Complete)
 - [x] FC 22 (Mask Write Register) – atomic AND/OR bitmask in modbus-write node

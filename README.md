@@ -6,13 +6,13 @@
 [![Node-RED](https://img.shields.io/badge/Platform-Node--RED-red.svg)](https://nodered.org)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org)
 [![Status](https://img.shields.io/badge/Status-MS--9%20Complete-brightgreen.svg)](#development-progress)
-[![Tests](https://img.shields.io/badge/Tests-646%20passing-brightgreen.svg)](#development-progress)
+[![Tests](https://img.shields.io/badge/Tests-785%20passing-brightgreen.svg)](#development-progress)
 
 ---
 
 ## Development Progress
 
-> **Current State (2026-05-05):** v0.1.0 released and finalization audit complete – all 11 implemented function codes (FC 01–06, 15, 16, 22, 23, 43/14) are validated. 646/646 tests passing, lint passing, 7 Node-RED nodes. MS-8 (QA & Release) and MS-9 (Extended FCs) complete.
+> **Current State (2026-05-05):** All 12 milestones complete. v0.2.0 release candidate – the package now ships **11 Node-RED nodes** and supports all spec function codes (FC 01–06, 07, 08, 11, 12, 15, 16, 17, 20, 21, 22, 23, 24, 43/14) plus advanced fieldbus operations (RBE, multi-rate scanner, safe-state watchdog, runtime metrics) and a new RTU-over-TCP transport. **785/785 tests passing**, lint clean.
 
 | # | Milestone | Status | Progress |
 |---|-----------|--------|----------|
@@ -25,11 +25,11 @@
 | MS-7 | Modbus/TCP Security | ✅ Complete | `██████████` 100 % |
 | MS-8 | Quality Assurance & Release | ✅ Complete | `██████████` 100 % |
 | MS-9 | High-Priority Extended FCs | ✅ Complete | `██████████` 100 % |
-| MS-10 | Serial Diagnostics & Legacy FCs | 🔲 Open | `░░░░░░░░░░` 0 % |
-| MS-11 | Fieldbus Architecture Extensions | 🔲 Open | `░░░░░░░░░░` 0 % |
-| MS-12 | Advanced Fieldbus Nodes | 🔲 Open | `░░░░░░░░░░` 0 % |
+| MS-10 | Serial Diagnostics & Legacy FCs | ✅ Complete | `██████████` 100 % |
+| MS-11 | Fieldbus Architecture Extensions | ✅ Complete | `██████████` 100 % |
+| MS-12 | Advanced Fieldbus Nodes | ✅ Complete | `██████████` 100 % |
 
-**Overall Progress: 9 / 12 milestones completed – 646 / 646 tests passing**
+**Overall Progress: 12 / 12 milestones completed – 785 / 785 tests passing**
 
 > Milestone details: [MILESTONES.md](MILESTONES.md) · Work packages: [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md)
 
@@ -44,7 +44,7 @@
 - **Backpressure Management** – configurable queue limits with FIFO/LIFO drop strategies
 - **Dynamic Server Proxying** – event-based processing without monolithic memory arrays
 - **Modbus/TCP Security (MBTPS)** – TLS 1.3, mTLS via X.509v3, port 802
-- **Implemented Function Codes** – FC 01-06, 15, 16, 22, 23, and 43/14; diagnostics are planned for MS-10
+- **Implemented Function Codes** – FC 01–08, 11, 12, 15–17, 20, 21, 22, 23, 24, and 43/14 (full Modbus Application Protocol coverage)
 
 ## Architecture Principles
 
@@ -132,7 +132,7 @@ Configuration node that manages a Modbus TCP or RTU connection.
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| Connection Type | `tcp` | `tcp` or `rtu` |
+| Connection Type | `tcp` | `tcp`, `rtu`, or `rtu-over-tcp` |
 | Host | `127.0.0.1` | TCP server address |
 | Port | `502` | TCP port |
 | Serial Port | `/dev/ttyUSB0` | RTU serial device path |
@@ -183,6 +183,92 @@ Reads device identification from a Modbus device using FC 43/14 (MEI Transport).
 **Input:** Any `msg` triggers a discovery request. Override with `msg.deviceIdCode` / `msg.objectId`.
 **Output:** `msg.payload` contains `{ conformityLevel, deviceInfo, objects, raw }`.
 
+### Modbus Diagnostic
+
+Issues serial-line diagnostic and identification function codes (FC 07, 08, 11, 12, 17) that are not covered by the regular read/write nodes.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Mode | `exceptionStatus` | `exceptionStatus` (FC 07) / `diagnostics` (FC 08) / `eventCounter` (FC 11) / `eventLog` (FC 12) / `reportServerId` (FC 17) |
+| Sub-function | `0` | FC 08 sub-function code (0=Loopback, 1=Restart, …) |
+| Data field | `0` | FC 08 data payload |
+
+**Input:** Any `msg` triggers the configured operation. FC 08 honors `msg.subFunction` / `msg.dataField` overrides.
+**Output:** Function-code-specific structured object (e.g. `{ statusByte, bits[] }` for FC 07; `{ status, eventCount, messageCount, events[] }` for FC 12).
+
+### Modbus File
+
+Provides access to file/FIFO function codes for legacy PLC file systems.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Mode | `readFile` | `readFile` (FC 20) / `writeFile` (FC 21) / `readFifo` (FC 24) |
+| File Number | `1` | Target file (1–65535) |
+| Record Number | `0` | Record offset (0–9999) |
+| Record Length | `1` | Read length in registers (1–125) |
+| FIFO Pointer | `0` | FIFO pointer address (FC 24 only) |
+
+**Input:** Any `msg` triggers the operation. FC 21 requires `msg.payload.values` (array of register values to write). All parameters can be overridden via `msg.payload`.
+**Output:** `{ records[][] }` for read, `{ valuesWritten }` for write, `{ count, values[] }` for FIFO.
+
+### Modbus RBE (Report-by-Exception)
+
+Suppresses unchanged values from a cyclic Modbus read flow. Only forwards a downstream message when at least one register/coil exceeds the configured dead-band.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Mode | `absolute` | `absolute` / `percentage` / `boolean` |
+| Dead-band | `0` | Threshold (raw value or percentage) |
+| Inhibit (ms) | `0` | Min time between reports per address |
+| Pass through first | `true` | Forward the very first message as a baseline |
+
+**Input:** Standard `modbus-read` payload (`{ fc, address, data: [...] }`). Send `msg.reset = true` to clear the baseline.
+**Output:** Original `msg.payload` plus `msg.changed` (array of addresses that crossed the threshold) and `msg.rbe` (mode/deadband/counts).
+
+### Modbus Scanner
+
+Single-instance polling scheduler that replaces a constellation of cyclic `modbus-read` nodes. Maintains a configurable list of read groups, each with its own interval, sharing one transport.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Scan groups (JSON) | `[{"id":"fast","intervalMs":1000,"fc":3,"address":0,"quantity":10}]` | Array of group definitions |
+| Auto-start | `true` | Start polling on deploy |
+
+Each group must specify `id`, `intervalMs` (≥ 50), `fc` (1–4), `address`, `quantity`, and optionally `unitId`. Overlapping cycles are dropped silently.
+
+**Commands:** `start`, `stop`, `trigger` (with optional `msg.groupId`), `stats`.
+**Output:** One message per group per cycle, with the same shape as `modbus-read`, plus `msg.modbusScanner = { groupId, intervalMs, cycle }`.
+
+### Modbus Watchdog
+
+Cyclically writes a heartbeat value to a Modbus device. On heartbeat failure or transport disconnect, performs a configurable safe-state write. Optional restore write returns the device to normal operation on reconnect.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Heartbeat interval | `1000` ms | Heartbeat period |
+| Heartbeat / Safe-state / Restore FC | `6` | Write FC (5/6/15/16) |
+| Heartbeat / Safe-state / Restore Address | `0` | Target address |
+| Heartbeat / Safe-state / Restore Value | `1` / `0` / `1` | Value to write |
+| Restore enabled | `false` | Issue a restore write on reconnect |
+
+**Commands (`msg.payload`):** `start`, `stop`, `safeState` (manual trigger), `status`.
+**Events:** `safeState` (with reason), `reconnect`.
+
+> **Safety disclaimer:** Node-RED is not a safety-rated runtime. This node provides defense-in-depth only and must not replace a hardware safety system.
+
+### Modbus Stats
+
+Aggregates runtime metrics across the configured Modbus client transport by transparently wrapping its read/write methods.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Mode | `periodic` | `periodic` (emit on interval) or `onDemand` |
+| Interval (ms) | `5000` | Snapshot period |
+| Latency buffer | `1000` | Ring buffer size for percentile calculations |
+
+**Commands:** `snapshot` / `get` (emit current metrics), `reset` (clear counters), `rehook` (re-attach to transport after manual reconnect).
+**Output:** `{ requests: { total, byFc }, errors: { total, byFc }, exceptions: { code: count }, latencyMs: { count, last, min, max, avg, p50, p95, p99 }, uptimeMs }`.
+
 ### Modbus Server Config
 
 Configuration node that creates a Modbus TCP server (slave simulator / proxy).
@@ -232,11 +318,11 @@ Sends a response back to the Modbus client that sent the original request.
 | 22 | Mask Write Register | 16-Bit (W) | ✅ |
 | 23 | Read/Write Multiple Registers | 16-Bit (R/W) | ✅ |
 | 43/14 | Read Device Identification | String (R) | ✅ |
-| 07 | Read Exception Status | Byte (R) | 🔲 MS-10 |
-| 08 | Diagnostics | Various | 🔲 MS-10 |
-| 11/12/17 | Serial Diagnostics | Various | 🔲 MS-10 |
-| 20/21 | File Record Access | File (R/W) | 🔲 MS-10 |
-| 24 | Read FIFO Queue | 16-Bit[] (R) | 🔲 MS-10 |
+| 07 | Read Exception Status | Byte (R) | ✅ MS-10 |
+| 08 | Diagnostics | Various | ✅ MS-10 |
+| 11/12/17 | Serial Diagnostics | Various | ✅ MS-10 |
+| 20/21 | File Record Access | File (R/W) | ✅ MS-10 |
+| 24 | Read FIFO Queue | 16-Bit[] (R) | ✅ MS-10 |
 
 ## Project Structure
 

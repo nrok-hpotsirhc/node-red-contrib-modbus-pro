@@ -9,6 +9,38 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added — MS-10 Serial Diagnostics & Legacy FCs
+- **WP 6.3 / 6.4 — `modbus-diagnostic` node** for serial-line diagnostic and identification function codes:
+  - **FC 07** — Read Exception Status (8 device-specific alarm bits, decoded into a boolean array)
+  - **FC 08** — Diagnostics with full sub-function multiplexing (loopback, counters, restart) and per-message overrides
+  - **FC 11** — Get Comm Event Counter (status word + event counter)
+  - **FC 12** — Get Comm Event Log (status / event count / message count / 64-event ring buffer)
+  - **FC 17** — Report Server ID (server byte, run indicator, vendor data)
+- **WP 6.4 — `modbus-file` node** for file/FIFO access:
+  - **FC 20** — Read File Record (tolerant parser handles both spec-compliant layouts)
+  - **FC 21** — Write File Record (with strict validation of file/record/values)
+  - **FC 24** — Read FIFO Queue (≤ 31 register values per response)
+- **BaseTransport extensions** — eight new `customFunction()`-based wrappers:
+  `readExceptionStatus`, `diagnostics`, `getCommEventCounter`, `getCommEventLog`,
+  `reportServerID` (delegates to native), `readFileRecord`, `writeFileRecord`, `readFifoQueue`.
+- **17 new integration tests** covering all five diagnostic modes, all three file modes,
+  per-message overrides, error propagation and concurrency guards.
+
+### Added — MS-11 Fieldbus Architecture Extensions
+- **WP 7.3 — `src/lib/parser/exception-parser.js`** — structured Modbus exception code mapping (codes 1–11 plus gateway 0x0A/0x0B). Surfaces `{ isException, code, name, message, fc, unitId, address }` on `msg.payload.exception`.
+- **WP 7.1 — `src/lib/transport/request-chunker.js`** — automatic request splitting with per-FC limits (1/2: 2000, 3/4: 125, 15: 1968, 16: 123) and Unit ID 0 broadcast handling.
+- **WP 7.2 — extended `src/lib/parser/buffer-parser.js`** with **Float64**, **Int64/UInt64** (returned as `BigInt`), **ASCII string** (with NUL trim), **BCD** encode/decode, and **Unix-32-bit timestamp** decoding for all four endianness variants.
+- **WP 7.4 — `src/lib/transport/rtu-over-tcp-transport.js`** + new `connectionType: 'rtu-over-tcp'` in the client config node and `transport-factory.js`. Supports raw RTU framing tunneled over TCP for legacy gateways.
+- **86 new unit tests** for chunker, exception parser, extended parsers, and RTU-over-TCP transport.
+
+### Added — MS-12 Advanced Fieldbus Nodes
+- **WP 7.5 — `modbus-rbe`** (Report-by-Exception): forwards messages only when at least one register/coil exceeds the configured **absolute** or **percentage** dead-band, or on any state change for coil reads. Supports inhibit time, baseline reset (`msg.reset = true`), and pass-through-initial toggle.
+- **WP 7.6 — `modbus-scanner`**: single-instance polling scheduler that replaces a constellation of cyclic `modbus-read` nodes. Configurable scan groups (each with its own interval/FC/address/quantity/unitId). Drops overlapping cycles to prevent backpressure. Supports `start` / `stop` / `trigger` / `stats` commands.
+- **WP 7.7 — `modbus-watchdog`**: cyclic heartbeat write (FC 05/06/15/16) with **latched safe-state** on heartbeat failure and optional **restore write** on reconnect. Emits `safeState` and `reconnect` events for downstream handling. Includes safety-rated runtime disclaimer in the help sidebar.
+- **WP 7.8 — `modbus-stats`**: transparent transport hooks count requests/errors per FC and per Modbus exception code, and compute `min/max/avg/p50/p95/p99` latency over a configurable ring buffer. Supports periodic and on-demand snapshot modes plus `reset` and `rehook` commands.
+- **30 new unit tests** for RBE filtering, scanner scheduling, watchdog state machine, and stats hooks.
+- **Node registry** — 4 new node types registered in `package.json` (`modbus-rbe`, `modbus-scanner`, `modbus-watchdog`, `modbus-stats`); package now ships **11 Node-RED nodes** in total.
+
 ### Fixed
 - **Code review follow-up (2026-05-05):** Removed UTF-8 BOM from `src/index.js` package entry point.
 - **Process lifecycle hardening (2026-05-05):** Added `.unref()` to status-reset timers in `modbus-in`/`modbus-out`, the safety timeout in `modbus-server-config.stopServer()`, and the drain-wait timer in `RtuSemaphore.drain()` so they no longer hold the Node.js event loop open during shutdown.
