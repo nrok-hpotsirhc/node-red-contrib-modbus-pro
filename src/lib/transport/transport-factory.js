@@ -2,13 +2,15 @@
 
 const TcpTransport = require('./tcp-transport');
 const RtuTransport = require('./rtu-transport');
+const RtuOverTcpTransport = require('./rtu-over-tcp-transport');
 
 /**
  * Required configuration fields by transport type.
  */
 const REQUIRED_FIELDS = {
   tcp: ['host', 'port'],
-  rtu: ['serialPort', 'baudRate']
+  rtu: ['serialPort', 'baudRate'],
+  'rtu-over-tcp': ['host', 'port']
 };
 
 /**
@@ -44,7 +46,7 @@ class TransportFactory {
     const type = config.type;
     if (!type || !REQUIRED_FIELDS[type]) {
       throw new Error(
-        `TransportFactory: invalid transport type '${type}'. Must be 'tcp' or 'rtu'.`
+        `TransportFactory: invalid transport type '${type}'. Must be 'tcp', 'rtu', or 'rtu-over-tcp'.`
       );
     }
 
@@ -59,6 +61,9 @@ class TransportFactory {
 
     if (type === 'tcp') {
       return new TcpTransport(config);
+    }
+    if (type === 'rtu-over-tcp') {
+      return new RtuOverTcpTransport(config);
     }
 
     return new RtuTransport(config);

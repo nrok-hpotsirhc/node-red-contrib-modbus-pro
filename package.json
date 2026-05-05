@@ -29,6 +29,12 @@
       "modbus-read": "src/nodes/client/modbus-read.js",
       "modbus-write": "src/nodes/client/modbus-write.js",
       "modbus-discover": "src/nodes/client/modbus-discover.js",
+      "modbus-diagnostic": "src/nodes/client/modbus-diagnostic.js",
+      "modbus-file": "src/nodes/client/modbus-file.js",
+      "modbus-rbe": "src/nodes/client/modbus-rbe.js",
+      "modbus-scanner": "src/nodes/client/modbus-scanner.js",
+      "modbus-watchdog": "src/nodes/client/modbus-watchdog.js",
+      "modbus-stats": "src/nodes/client/modbus-stats.js",
       "modbus-server-config": "src/nodes/config/modbus-server-config.js",
       "modbus-in": "src/nodes/server/modbus-in.js",
       "modbus-out": "src/nodes/server/modbus-out.js"

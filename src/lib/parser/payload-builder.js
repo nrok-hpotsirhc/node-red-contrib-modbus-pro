@@ -103,6 +103,9 @@ function buildConnectionString(config) {
   if (config.type === 'tcp') {
     return `tcp://${config.host || '0.0.0.0'}:${config.port || 502}`;
   }
+  if (config.type === 'rtu-over-tcp') {
+    return `rtu+tcp://${config.host || '0.0.0.0'}:${config.port || 4001}`;
+  }
   if (config.type === 'rtu') {
     return `rtu://${config.serialPort || 'unknown'}@${config.baudRate || 9600}`;
   }

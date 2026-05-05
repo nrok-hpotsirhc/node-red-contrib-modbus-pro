@@ -234,6 +234,199 @@ function _validateRegisterPair(registers) {
   }
 }
 
+/**
+ * Rearrange 8 bytes from four registers according to the specified byte order.
+ *
+ * For 64-bit values the same logical orderings apply as for 32-bit:
+ *   BE     – big-endian  (R0 R1 R2 R3 → bytes 0..7 in MSB-first order)
+ *   LE     – little-endian word order (R3 R2 R1 R0)
+ *   BE_BS  – big-endian, byte-swapped within each word
+ *   LE_BS  – little-endian word order, byte-swapped within each word
+ *
+ * @param {Buffer} buf - 8-byte buffer (4 registers, big-endian).
+ * @param {string} byteOrder
+ * @returns {Buffer} 8-byte buffer in canonical big-endian order.
+ * @private
+ */
+function _reorder8Bytes(buf, byteOrder) {
+  const out = Buffer.alloc(8);
+  switch (byteOrder) {
+    case BYTE_ORDER.BE: // R0 R1 R2 R3 – already in order
+      buf.copy(out, 0, 0, 8);
+      break;
+    case BYTE_ORDER.LE: // R3 R2 R1 R0 – reverse word order
+      out[0] = buf[6]; out[1] = buf[7];
+      out[2] = buf[4]; out[3] = buf[5];
+      out[4] = buf[2]; out[5] = buf[3];
+      out[6] = buf[0]; out[7] = buf[1];
+      break;
+    case BYTE_ORDER.BE_BS: // byte-swap inside each word, keep word order
+      out[0] = buf[1]; out[1] = buf[0];
+      out[2] = buf[3]; out[3] = buf[2];
+      out[4] = buf[5]; out[5] = buf[4];
+      out[6] = buf[7]; out[7] = buf[6];
+      break;
+    case BYTE_ORDER.LE_BS: // reverse word order AND byte-swap inside each word
+      out[0] = buf[7]; out[1] = buf[6];
+      out[2] = buf[5]; out[3] = buf[4];
+      out[4] = buf[3]; out[5] = buf[2];
+      out[6] = buf[1]; out[7] = buf[0];
+      break;
+    default:
+      throw new RangeError(`Unknown byte order: ${byteOrder}`);
+  }
+  return out;
+}
+
+/**
+ * Validate that the input is exactly four 16-bit registers.
+ * @private
+ */
+function _validateRegisterQuad(registers) {
+  if (!Array.isArray(registers) || registers.length !== 4) {
+    throw new RangeError('Expected an array of exactly 4 register values');
+  }
+  for (let i = 0; i < 4; i++) {
+    const v = registers[i];
+    if (typeof v !== 'number' || !Number.isFinite(v) || !Number.isInteger(v) || v < 0 || v > 0xFFFF) {
+      throw new RangeError(`Register ${i} must be an integer in [0, 65535], got: ${v}`);
+    }
+  }
+}
+
+/**
+ * Parse a Float64 (IEEE 754 double-precision) value from four 16-bit registers.
+ *
+ * @param {number[]} registers - Exactly 4 unsigned 16-bit values.
+ * @param {string} [byteOrder='BE'] - Byte order for word arrangement.
+ * @returns {number} Parsed 64-bit float.
+ */
+function parseFloat64(registers, byteOrder = BYTE_ORDER.BE) {
+  _validateRegisterQuad(registers);
+  const buf = registersToBuffer(registers);
+  return _reorder8Bytes(buf, byteOrder).readDoubleBE(0);
+}
+
+/**
+ * Parse an Int64 value from four 16-bit registers. Returns a BigInt to
+ * preserve full 64-bit precision (Number is limited to 2^53 - 1).
+ *
+ * @param {number[]} registers - Exactly 4 unsigned 16-bit values.
+ * @param {string} [byteOrder='BE'] - Byte order for word arrangement.
+ * @returns {bigint}
+ */
+function parseInt64(registers, byteOrder = BYTE_ORDER.BE) {
+  _validateRegisterQuad(registers);
+  const buf = registersToBuffer(registers);
+  return _reorder8Bytes(buf, byteOrder).readBigInt64BE(0);
+}
+
+/**
+ * Parse a UInt64 value from four 16-bit registers as a BigInt.
+ *
+ * @param {number[]} registers - Exactly 4 unsigned 16-bit values.
+ * @param {string} [byteOrder='BE'] - Byte order for word arrangement.
+ * @returns {bigint}
+ */
+function parseUInt64(registers, byteOrder = BYTE_ORDER.BE) {
+  _validateRegisterQuad(registers);
+  const buf = registersToBuffer(registers);
+  return _reorder8Bytes(buf, byteOrder).readBigUInt64BE(0);
+}
+
+/**
+ * Parse an ASCII string from a sequence of 16-bit registers.
+ *
+ * Each register holds two ASCII bytes (high byte first by Modbus convention).
+ * Trailing NUL bytes (0x00) are trimmed; non-printable bytes are kept verbatim.
+ * If `byteSwap` is true, the two bytes within each register are swapped before
+ * decoding (some PLCs invert ASCII byte order).
+ *
+ * @param {number[]} registers - One or more unsigned 16-bit values.
+ * @param {object} [opts]
+ * @param {boolean} [opts.byteSwap=false]
+ * @param {string} [opts.encoding='ascii']
+ * @returns {string}
+ */
+function parseString(registers, opts) {
+  if (!Array.isArray(registers) || registers.length === 0) {
+    throw new RangeError('parseString: registers must be a non-empty array');
+  }
+  const options = opts || {};
+  const encoding = options.encoding || 'ascii';
+  const byteSwap = options.byteSwap === true;
+
+  const buf = Buffer.alloc(registers.length * 2);
+  for (let i = 0; i < registers.length; i++) {
+    const v = registers[i];
+    if (typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > 0xFFFF) {
+      throw new RangeError(`parseString: register ${i} must be in [0, 65535], got: ${v}`);
+    }
+    if (byteSwap) {
+      buf.writeUInt16LE(v & 0xFFFF, i * 2);
+    } else {
+      buf.writeUInt16BE(v & 0xFFFF, i * 2);
+    }
+  }
+  // Truncate at first NUL byte
+  let end = buf.length;
+  for (let i = 0; i < buf.length; i++) {
+    if (buf[i] === 0x00) { end = i; break; }
+  }
+  return buf.toString(encoding, 0, end);
+}
+
+/**
+ * Parse a 16-bit register value as 4-digit packed BCD.
+ *
+ * Example: register 0x1234 → 1234.
+ * Throws if any nibble is greater than 9.
+ *
+ * @param {number} register - Unsigned 16-bit value.
+ * @returns {number}
+ */
+function parseBCD16(register) {
+  if (typeof register !== 'number' || !Number.isInteger(register) || register < 0 || register > 0xFFFF) {
+    throw new RangeError(`parseBCD16: register must be in [0, 65535], got: ${register}`);
+  }
+  let result = 0;
+  for (let shift = 12; shift >= 0; shift -= 4) {
+    const nibble = (register >> shift) & 0x0F;
+    if (nibble > 9) {
+      throw new RangeError(`parseBCD16: invalid BCD digit 0x${nibble.toString(16)} in register 0x${register.toString(16)}`);
+    }
+    result = result * 10 + nibble;
+  }
+  return result;
+}
+
+/**
+ * Parse a 32-bit packed BCD value spanning two registers (8 decimal digits).
+ *
+ * @param {number[]} registers - Exactly 2 unsigned 16-bit values.
+ * @param {string} [byteOrder='BE'] - Word order: BE = high register first.
+ * @returns {number}
+ */
+function parseBCD32(registers, byteOrder = BYTE_ORDER.BE) {
+  _validateRegisterPair(registers);
+  const high = byteOrder === BYTE_ORDER.LE ? registers[1] : registers[0];
+  const low = byteOrder === BYTE_ORDER.LE ? registers[0] : registers[1];
+  return parseBCD16(high) * 10000 + parseBCD16(low);
+}
+
+/**
+ * Parse a 32-bit Unix timestamp (seconds since 1970-01-01) from 2 registers
+ * and convert it to a JavaScript Date.
+ *
+ * @param {number[]} registers - Exactly 2 unsigned 16-bit values.
+ * @param {string} [byteOrder='BE'] - Byte order for word arrangement.
+ * @returns {Date}
+ */
+function parseUnixTimestamp(registers, byteOrder = BYTE_ORDER.BE) {
+  const seconds = parseUInt32(registers, byteOrder);
+  return new Date(seconds * 1000);
+}
+
 module.exports = {
   BYTE_ORDER,
   registersToBuffer,
@@ -244,5 +437,13 @@ module.exports = {
   parseUInt16,
   parseFloat32Array,
   parseUInt32Array,
-  parseInt32Array
+  parseInt32Array,
+  // Extended data types (WP 7.2)
+  parseFloat64,
+  parseInt64,
+  parseUInt64,
+  parseString,
+  parseBCD16,
+  parseBCD32,
+  parseUnixTimestamp
 };

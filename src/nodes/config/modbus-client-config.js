@@ -36,6 +36,9 @@ module.exports = function (RED) {
     node.dataBits = parseIntSafe(config.dataBits, 8);
     node.stopBits = parseIntSafe(config.stopBits, 1);
 
+    // RTU-over-TCP parameters (WP 7.4)
+    node.interFrameDelay = parseIntSafe(config.interFrameDelay, 0);
+
     // Common parameters
     node.unitId = parseIntSafe(config.unitId, 1);
     node.timeout = parseIntSafe(config.timeout, 1000);
@@ -85,6 +88,17 @@ module.exports = function (RED) {
           stopBits: node.stopBits,
           unitId: node.unitId,
           timeout: node.timeout
+        };
+      }
+
+      if (node.connectionType === 'rtu-over-tcp') {
+        return {
+          type: 'rtu-over-tcp',
+          host: node.host,
+          port: node.port,
+          unitId: node.unitId,
+          timeout: node.timeout,
+          interFrameDelay: node.interFrameDelay
         };
       }
 
@@ -147,7 +161,10 @@ module.exports = function (RED) {
       `Modbus client config initialized: ${node.connectionType}` +
         (node.connectionType === 'tcp'
           ? ` ${node.host}:${node.port}${node.tlsEnabled ? ' (TLS)' : ''}`
-          : ` ${node.serialPort}@${node.baudRate}`) +
+          : node.connectionType === 'rtu-over-tcp'
+            ? ` ${node.host}:${node.port}` +
+              (node.interFrameDelay > 0 ? ` (t3.5 ${node.interFrameDelay}ms)` : '')
+            : ` ${node.serialPort}@${node.baudRate}`) +
         ` unit=${node.unitId}`
     );
 

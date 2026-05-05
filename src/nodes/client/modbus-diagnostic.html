@@ -1,0 +1,105 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-diagnostic', {
+        category: 'modbus',
+        color: '#C0DEED',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            mode: { value: 'exceptionStatus' },
+            subFunction: { value: 0, validate: RED.validators.number() },
+            dataField: { value: 0, validate: RED.validators.number() }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'debug.svg',
+        paletteLabel: 'modbus diagnostic',
+        label: function () {
+            if (this.name) return this.name;
+            var labels = {
+                exceptionStatus: 'FC07 Exc. Status',
+                diagnostics: 'FC08 Diagnostics',
+                eventCounter: 'FC11 Event Cnt',
+                eventLog: 'FC12 Event Log',
+                reportServerId: 'FC17 Server ID'
+            };
+            return labels[this.mode] || 'Modbus Diagnostic';
+        },
+        oneditprepare: function () {
+            var modeSelect = $('#node-input-mode');
+            var diagRow = $('#modbus-diag-fc08-row');
+            function updateVisibility() {
+                if (modeSelect.val() === 'diagnostics') diagRow.show();
+                else diagRow.hide();
+            }
+            modeSelect.on('change', updateVisibility);
+            updateVisibility();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-diagnostic">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Modbus Diagnostic">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-stethoscope"></i> Mode</label>
+        <select id="node-input-mode">
+            <option value="exceptionStatus">FC 07 – Read Exception Status</option>
+            <option value="diagnostics">FC 08 – Diagnostics (sub-function)</option>
+            <option value="eventCounter">FC 11 – Get Comm Event Counter</option>
+            <option value="eventLog">FC 12 – Get Comm Event Log</option>
+            <option value="reportServerId">FC 17 – Report Server ID</option>
+        </select>
+    </div>
+
+    <div id="modbus-diag-fc08-row" style="display:none">
+        <div class="form-row">
+            <label for="node-input-subFunction"><i class="fa fa-hashtag"></i> Sub-Function</label>
+            <input type="text" id="node-input-subFunction" placeholder="0 (Loopback)">
+        </div>
+        <div class="form-row">
+            <label for="node-input-dataField"><i class="fa fa-database"></i> Data</label>
+            <input type="text" id="node-input-dataField" placeholder="0">
+        </div>
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-diagnostic">
+    <p>Issues serial-line diagnostic and identification function codes
+    that are not covered by the regular read/write nodes.</p>
+
+    <h3>Modes</h3>
+    <table>
+        <tr><td><b>FC 07</b></td><td>Read Exception Status — 8 device-specific alarm bits</td></tr>
+        <tr><td><b>FC 08</b></td><td>Diagnostics — multiplexed via 16-bit sub-function (loopback, counters, restart, …)</td></tr>
+        <tr><td><b>FC 11</b></td><td>Comm Event Counter — status word + event counter</td></tr>
+        <tr><td><b>FC 12</b></td><td>Comm Event Log — status, event count, message count, 64-event ring buffer</td></tr>
+        <tr><td><b>FC 17</b></td><td>Report Server ID — serverId byte, run-indicator, vendor data</td></tr>
+    </table>
+
+    <h3>Input</h3>
+    <p>Send any message to trigger the configured operation. For FC 08 you may
+    override the sub-function and data field via:</p>
+    <dl class="message-properties">
+        <dt class="optional">subFunction <span class="property-type">number</span></dt>
+        <dd>0x0000–0xFFFF — overrides the configured sub-function code.</dd>
+        <dt class="optional">dataField <span class="property-type">number</span></dt>
+        <dd>0x0000–0xFFFF — overrides the configured data payload.</dd>
+    </dl>
+
+    <h3>Output</h3>
+    <p><code>msg.payload</code> contains a structured object with the function-code-specific fields.</p>
+
+    <h3>Notes</h3>
+    <ul>
+        <li>FC 07, 08, 11 and 12 are defined for serial line only. Most TCP-to-RTU gateways forward them transparently when configured in raw RTU mode.</li>
+        <li>If the device returns a Modbus exception, the parsed exception is attached to <code>msg.payload.exception</code>.</li>
+    </ul>
+</script>

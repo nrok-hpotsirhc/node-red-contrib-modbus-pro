@@ -1,0 +1,106 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-file', {
+        category: 'modbus',
+        color: '#C0DEED',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            mode: { value: 'readFile' },
+            fileNumber: { value: 1, validate: RED.validators.number() },
+            recordNumber: { value: 0, validate: RED.validators.number() },
+            recordLength: { value: 1, validate: RED.validators.number() },
+            fifoAddress: { value: 0, validate: RED.validators.number() }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'file.svg',
+        paletteLabel: 'modbus file',
+        label: function () {
+            if (this.name) return this.name;
+            var labels = {
+                readFile: 'FC20 Read File',
+                writeFile: 'FC21 Write File',
+                readFifo: 'FC24 Read FIFO'
+            };
+            return labels[this.mode] || 'Modbus File';
+        },
+        oneditprepare: function () {
+            var modeSelect = $('#node-input-mode');
+            var fileRow = $('.modbus-file-record-row');
+            var fifoRow = $('.modbus-file-fifo-row');
+            function updateVisibility() {
+                if (modeSelect.val() === 'readFifo') {
+                    fileRow.hide();
+                    fifoRow.show();
+                } else {
+                    fileRow.show();
+                    fifoRow.hide();
+                }
+            }
+            modeSelect.on('change', updateVisibility);
+            updateVisibility();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-file">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Modbus File">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-folder-open"></i> Mode</label>
+        <select id="node-input-mode">
+            <option value="readFile">FC 20 – Read File Record</option>
+            <option value="writeFile">FC 21 – Write File Record</option>
+            <option value="readFifo">FC 24 – Read FIFO Queue</option>
+        </select>
+    </div>
+    <div class="form-row modbus-file-record-row">
+        <label for="node-input-fileNumber"><i class="fa fa-hashtag"></i> File Number</label>
+        <input type="text" id="node-input-fileNumber" placeholder="1">
+    </div>
+    <div class="form-row modbus-file-record-row">
+        <label for="node-input-recordNumber"><i class="fa fa-hashtag"></i> Record</label>
+        <input type="text" id="node-input-recordNumber" placeholder="0">
+    </div>
+    <div class="form-row modbus-file-record-row">
+        <label for="node-input-recordLength"><i class="fa fa-arrows-h"></i> Length</label>
+        <input type="text" id="node-input-recordLength" placeholder="1 (read only)">
+    </div>
+    <div class="form-row modbus-file-fifo-row" style="display:none">
+        <label for="node-input-fifoAddress"><i class="fa fa-hashtag"></i> FIFO Pointer</label>
+        <input type="text" id="node-input-fifoAddress" placeholder="0">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-file">
+    <p>File and FIFO access for Modbus devices that expose extended memory areas.</p>
+
+    <h3>Modes</h3>
+    <table>
+        <tr><td><b>FC 20</b></td><td>Read File Record — reads a record (sequence of registers) from a file.</td></tr>
+        <tr><td><b>FC 21</b></td><td>Write File Record — writes a record. Values must be supplied via <code>msg.payload.values</code>.</td></tr>
+        <tr><td><b>FC 24</b></td><td>Read FIFO Queue — returns up to 31 register values associated with a pointer address.</td></tr>
+    </table>
+
+    <h3>Per-message overrides (msg.payload)</h3>
+    <dl class="message-properties">
+        <dt class="optional">fileNumber <span class="property-type">number</span></dt><dd>1–65535</dd>
+        <dt class="optional">recordNumber <span class="property-type">number</span></dt><dd>0–9999</dd>
+        <dt class="optional">recordLength <span class="property-type">number</span></dt><dd>1–125 (read mode only)</dd>
+        <dt class="optional">fifoAddress <span class="property-type">number</span></dt><dd>0–65535 (FC 24 only)</dd>
+        <dt class="optional">values <span class="property-type">number[]</span></dt><dd>Register values to write (FC 21 only).</dd>
+    </dl>
+
+    <h3>Notes</h3>
+    <ul>
+        <li>Reference Type is always 0x06 per spec.</li>
+        <li>FC 21 is destructive — verify file/record numbers carefully.</li>
+        <li>FC 24 is capped at 31 registers per response.</li>
+    </ul>
+</script>
