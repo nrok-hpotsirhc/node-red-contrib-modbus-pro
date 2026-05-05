@@ -347,7 +347,7 @@ describe('modbus-read (integration)', function () {
       const configNode = helper.getNode('config1');
       const readNode = helper.getNode('read1');
 
-      const transport = simulateConnectedTransport(configNode);
+      simulateConnectedTransport(configNode);
 
       // Make readHoldingRegisters reject
       ModbusRTU.prototype.readHoldingRegisters.rejects(new Error('Timeout'));

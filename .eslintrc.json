@@ -10,6 +10,6 @@
     "ecmaVersion": 2022
   },
   "rules": {
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   }
 }
