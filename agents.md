@@ -207,7 +207,7 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 | Test suite | 646 / 646 passing; lint passing |
 | Active milestone | MS-10 – Serial Diagnostics & Legacy FCs (next open) |
 | Next open deliverable | WP 6.3 – FC 08 (Diagnostics) + FC 07 (Read Exception Status) |
-| Open items | None – v0.1.0 ready for npm publish; finalization audit complete |
+| Open items | None – v0.1.0 ready for npm publish; finalization audit + post-audit cleanup complete |
 | Known issues | None |
 | Planned (MS-10–12) | 6 WPs, 10 missing FCs, 4 fieldbus extensions – theoretical foundations (§12–§17) complete |
 
