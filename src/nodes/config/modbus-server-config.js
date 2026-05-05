@@ -415,6 +415,7 @@ module.exports = function (RED) {
           node._started = false;
           resolve();
         }, 10000);
+        if (safetyTimer.unref) safetyTimer.unref();
 
         const closeModbusServer = function (next) {
           if (node._server) {

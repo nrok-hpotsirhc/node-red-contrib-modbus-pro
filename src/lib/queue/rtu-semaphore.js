@@ -176,6 +176,7 @@ class RtuSemaphore extends EventEmitter {
     if (this._busy) {
       await new Promise((resolve) => {
         const timer = setTimeout(resolve, this._timeout);
+        if (timer.unref) timer.unref();
 
         const done = () => {
           clearTimeout(timer);

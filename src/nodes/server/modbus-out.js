@@ -48,6 +48,7 @@ module.exports = function (RED) {
         node._lastStatus = 'idle';
         node.status({ fill: 'green', shape: 'dot', text: 'Ready' });
       }, 200);
+      if (timer.unref) timer.unref();
       node._statusTimers.push(timer);
     }
 

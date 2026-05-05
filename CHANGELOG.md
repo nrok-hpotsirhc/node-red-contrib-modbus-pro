@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- **Code review follow-up (2026-05-05):** Removed UTF-8 BOM from `src/index.js` package entry point.
+- **Process lifecycle hardening (2026-05-05):** Added `.unref()` to status-reset timers in `modbus-in`/`modbus-out`, the safety timeout in `modbus-server-config.stopServer()`, and the drain-wait timer in `RtuSemaphore.drain()` so they no longer hold the Node.js event loop open during shutdown.
 - **Finalization audit (2026-05-05):** Restored runnable validation by adding an ESLint configuration and automatic TLS certificate fixture generation before test commands.
 - **Client node lifecycle:** Added on-demand connected transport creation for read, write, and discover nodes so deployed flows can establish connections without manually seeding `_transport`.
 - **Node status transitions:** Added status reset cleanup for `modbus-read` success states and all `modbus-out` validation error paths.
