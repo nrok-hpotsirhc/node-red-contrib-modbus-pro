@@ -1,0 +1,124 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-watchdog', {
+        category: 'modbus',
+        color: '#FFCC66',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            heartbeatInterval: { value: 1000, validate: RED.validators.number() },
+            timeoutMultiplier: { value: 2, validate: RED.validators.number() },
+            heartbeatFc: { value: 6 },
+            heartbeatAddress: { value: 0, validate: RED.validators.number() },
+            heartbeatValue: { value: 1, validate: RED.validators.number() },
+            safeStateFc: { value: 6 },
+            safeStateAddress: { value: 0, validate: RED.validators.number() },
+            safeStateValue: { value: 0, validate: RED.validators.number() },
+            restoreEnabled: { value: false },
+            restoreFc: { value: 6 },
+            restoreAddress: { value: 0, validate: RED.validators.number() },
+            restoreValue: { value: 1, validate: RED.validators.number() }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'shield.svg',
+        paletteLabel: 'modbus watchdog',
+        label: function () {
+            return this.name || ('Watchdog ' + this.heartbeatInterval + 'ms');
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-watchdog">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-heartbeatInterval"><i class="fa fa-heartbeat"></i> Interval (ms)</label>
+        <input type="text" id="node-input-heartbeatInterval">
+    </div>
+    <div class="form-row">
+        <label for="node-input-timeoutMultiplier"><i class="fa fa-clock-o"></i> Timeout × interval</label>
+        <input type="text" id="node-input-timeoutMultiplier">
+    </div>
+
+    <h4>Heartbeat write</h4>
+    <div class="form-row">
+        <label for="node-input-heartbeatFc">FC</label>
+        <select id="node-input-heartbeatFc">
+            <option value="5">FC 05 – Write Single Coil</option>
+            <option value="6">FC 06 – Write Single Register</option>
+            <option value="15">FC 15 – Write Multiple Coils</option>
+            <option value="16">FC 16 – Write Multiple Registers</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-heartbeatAddress">Address</label>
+        <input type="text" id="node-input-heartbeatAddress">
+    </div>
+    <div class="form-row">
+        <label for="node-input-heartbeatValue">Value</label>
+        <input type="text" id="node-input-heartbeatValue">
+    </div>
+
+    <h4>Safe-state write (triggered on connection loss)</h4>
+    <div class="form-row">
+        <label for="node-input-safeStateFc">FC</label>
+        <select id="node-input-safeStateFc">
+            <option value="5">FC 05</option><option value="6">FC 06</option>
+            <option value="15">FC 15</option><option value="16">FC 16</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-safeStateAddress">Address</label>
+        <input type="text" id="node-input-safeStateAddress">
+    </div>
+    <div class="form-row">
+        <label for="node-input-safeStateValue">Value</label>
+        <input type="text" id="node-input-safeStateValue">
+    </div>
+
+    <h4>Restore (optional)</h4>
+    <div class="form-row">
+        <label for="node-input-restoreEnabled">&nbsp;</label>
+        <input type="checkbox" id="node-input-restoreEnabled" style="width:auto"> Send restore write on reconnect
+    </div>
+    <div class="form-row">
+        <label for="node-input-restoreFc">FC</label>
+        <select id="node-input-restoreFc">
+            <option value="5">FC 05</option><option value="6">FC 06</option>
+            <option value="15">FC 15</option><option value="16">FC 16</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-restoreAddress">Address</label>
+        <input type="text" id="node-input-restoreAddress">
+    </div>
+    <div class="form-row">
+        <label for="node-input-restoreValue">Value</label>
+        <input type="text" id="node-input-restoreValue">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-watchdog">
+    <p>Cyclically writes a heartbeat value to a Modbus device. If the
+    connection drops or the heartbeat fails, a configurable safe-state
+    write is issued. An optional restore write returns the device to
+    operation when the link recovers.</p>
+
+    <h3>Commands (msg.payload or msg.command)</h3>
+    <table>
+        <tr><td><code>"start"</code></td><td>Start the heartbeat loop.</td></tr>
+        <tr><td><code>"stop"</code></td><td>Stop the heartbeat loop.</td></tr>
+        <tr><td><code>"safeState"</code></td><td>Manually trigger the safe-state write.</td></tr>
+        <tr><td><code>"status"</code></td><td>Emit current state on the output.</td></tr>
+    </table>
+
+    <h3>Safety disclaimer</h3>
+    <p>Node-RED is not a safety-rated runtime. This node provides defense-in-depth
+    only and must not replace a hardware safety system.</p>
+</script>

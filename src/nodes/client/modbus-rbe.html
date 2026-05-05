@@ -1,0 +1,79 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-rbe', {
+        category: 'modbus',
+        color: '#C0DEED',
+        defaults: {
+            name: { value: '' },
+            mode: { value: 'absolute' },
+            deadband: { value: 0, validate: RED.validators.number() },
+            inhibitMs: { value: 0, validate: RED.validators.number() },
+            passThroughInitial: { value: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'filter.svg',
+        paletteLabel: 'modbus rbe',
+        label: function () {
+            if (this.name) return this.name;
+            if (this.mode === 'percentage') return 'RBE ±' + this.deadband + '%';
+            if (this.mode === 'boolean') return 'RBE bool';
+            return 'RBE ±' + this.deadband;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-rbe">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Modbus RBE">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-filter"></i> Mode</label>
+        <select id="node-input-mode">
+            <option value="absolute">Absolute dead-band</option>
+            <option value="percentage">Percentage dead-band</option>
+            <option value="boolean">Boolean (state change)</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-deadband"><i class="fa fa-arrows-h"></i> Dead-band</label>
+        <input type="text" id="node-input-deadband" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inhibitMs"><i class="fa fa-clock-o"></i> Inhibit (ms)</label>
+        <input type="text" id="node-input-inhibitMs" placeholder="0">
+    </div>
+    <div class="form-row">
+        <label for="node-input-passThroughInitial">&nbsp;</label>
+        <input type="checkbox" id="node-input-passThroughInitial" style="width:auto"> Pass through first message
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-rbe">
+    <p>Report-by-Exception filter. Forwards <code>msg</code> only when at least
+    one register/coil exceeds the configured dead-band relative to its last
+    reported value, suppressing redundant cyclic data.</p>
+
+    <h3>Modes</h3>
+    <table>
+        <tr><td><b>Absolute</b></td><td>Reports when |v_new − v_last| &gt; dead-band.</td></tr>
+        <tr><td><b>Percentage</b></td><td>Reports when |Δ| / |v_last| × 100 &gt; dead-band%. Always reports moves away from 0.</td></tr>
+        <tr><td><b>Boolean</b></td><td>Reports on any state flip. Auto-applied to coil reads (FC 01/02/05/15).</td></tr>
+    </table>
+
+    <h3>Inhibit time</h3>
+    <p>Suppresses any report for the given period after the previous report
+    of the same address, even if the dead-band is crossed. 0 disables.</p>
+
+    <h3>Input</h3>
+    <p>Standard <code>msg.payload</code> from <b>modbus-read</b>: <code>{ fc, address, data: [...] }</code>.</p>
+    <p>Send <code>msg.reset = true</code> to clear the internal baseline.</p>
+
+    <h3>Output</h3>
+    <dl class="message-properties">
+        <dt>changed <span class="property-type">number[]</span></dt>
+        <dd>Absolute Modbus addresses that crossed the threshold.</dd>
+        <dt>rbe <span class="property-type">object</span></dt>
+        <dd>Mode / dead-band / changed count / total count.</dd>
+    </dl>
+</script>

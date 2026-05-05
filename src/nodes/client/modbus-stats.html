@@ -1,0 +1,68 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-stats', {
+        category: 'modbus',
+        color: '#C0DEED',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            mode: { value: 'periodic' },
+            intervalMs: { value: 5000, validate: RED.validators.number() },
+            bufferSize: { value: 1000, validate: RED.validators.number() }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'chart.svg',
+        paletteLabel: 'modbus stats',
+        label: function () { return this.name || ('Stats (' + this.mode + ')'); }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-stats">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-mode"><i class="fa fa-clock-o"></i> Mode</label>
+        <select id="node-input-mode">
+            <option value="periodic">Periodic snapshot</option>
+            <option value="onDemand">On demand</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-intervalMs">Interval (ms)</label>
+        <input type="text" id="node-input-intervalMs">
+    </div>
+    <div class="form-row">
+        <label for="node-input-bufferSize">Latency buffer</label>
+        <input type="text" id="node-input-bufferSize">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-stats">
+    <p>Aggregates runtime metrics across the configured Modbus client transport
+    by transparently wrapping its read/write methods. Counts requests and
+    errors per FC, classifies Modbus exceptions, and computes a percentile
+    latency profile (p50/p95/p99).</p>
+
+    <h3>Output</h3>
+    <p><code>msg.payload</code> contains:</p>
+    <pre>{
+  timestamp, uptimeMs, unitId,
+  requests: { total, byFc },
+  errors:   { total, byFc },
+  exceptions: { 1: 0, 2: 0, ... },
+  latencyMs: { count, last, min, max, avg, p50, p95, p99 }
+}</pre>
+
+    <h3>Commands</h3>
+    <table>
+        <tr><td><code>"snapshot"</code> / <code>"get"</code></td><td>Emit current snapshot.</td></tr>
+        <tr><td><code>"reset"</code></td><td>Reset counters and latency buffer.</td></tr>
+        <tr><td><code>"rehook"</code></td><td>Force re-hooking of transport (use after manual transport rebuild).</td></tr>
+    </table>
+</script>

@@ -1,0 +1,77 @@
+<script type="text/javascript">
+    RED.nodes.registerType('modbus-scanner', {
+        category: 'modbus',
+        color: '#C0DEED',
+        defaults: {
+            name: { value: '' },
+            server: { value: '', type: 'modbus-client-config', required: true },
+            groups: {
+                value: '[{"id":"fast","intervalMs":1000,"fc":3,"address":0,"quantity":10}]',
+                validate: function (v) {
+                    try { var p = (typeof v === 'string') ? JSON.parse(v) : v; return Array.isArray(p) && p.length > 0; }
+                    catch (e) { return false; }
+                }
+            },
+            autoStart: { value: true }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'timer.svg',
+        paletteLabel: 'modbus scanner',
+        label: function () {
+            if (this.name) return this.name;
+            try {
+                var p = (typeof this.groups === 'string') ? JSON.parse(this.groups) : this.groups;
+                return 'Scanner (' + p.length + ' groups)';
+            } catch (e) { return 'Scanner'; }
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="modbus-scanner">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-cog"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-groups"><i class="fa fa-list"></i> Scan groups (JSON)</label>
+        <textarea id="node-input-groups" rows="6" style="width:100%; font-family: monospace"></textarea>
+    </div>
+    <div class="form-row">
+        <label for="node-input-autoStart">&nbsp;</label>
+        <input type="checkbox" id="node-input-autoStart" style="width:auto"> Start automatically on deploy
+    </div>
+</script>
+
+<script type="text/html" data-help-name="modbus-scanner">
+    <p>Single-instance polling scheduler that replaces a constellation of cyclic
+    <b>modbus-read</b> nodes. Maintains a configurable list of read groups, each
+    with its own interval, sharing one transport and serializing requests
+    through the existing connection pool / RTU semaphore.</p>
+
+    <h3>Group format (JSON array)</h3>
+    <pre>[
+  { "id": "fast", "intervalMs": 100,  "fc": 3, "address": 100, "quantity": 10 },
+  { "id": "slow", "intervalMs": 5000, "fc": 4, "address": 500, "quantity": 50, "unitId": 2 }
+]</pre>
+
+    <h3>Constraints</h3>
+    <ul>
+        <li><code>intervalMs</code> must be ≥ 50.</li>
+        <li><code>fc</code> must be one of 1, 2, 3, 4 (read-only).</li>
+        <li><code>quantity</code> 1..2000 (coils) or 1..125 (registers). Larger reads need WP 7.1 chunking.</li>
+        <li>Overlapping cycles are dropped silently to prevent backpressure.</li>
+    </ul>
+
+    <h3>Commands (msg.payload or msg.command)</h3>
+    <table>
+        <tr><td><code>"start"</code></td><td>Start scanning.</td></tr>
+        <tr><td><code>"stop"</code></td><td>Stop scanning.</td></tr>
+        <tr><td><code>"trigger"</code></td><td>One-shot scan. Optionally <code>msg.groupId</code>.</td></tr>
+        <tr><td><code>"stats"</code></td><td>Emit cycles/error counters.</td></tr>
+    </table>
+</script>
