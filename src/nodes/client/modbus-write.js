@@ -225,12 +225,13 @@ module.exports = function (RED) {
      * @returns {Promise<void>}
      */
     async function doWrite(entry) {
-      if (!node.server._transport || !node.server._transport.isOpen()) {
+      const transport = typeof node.server.getConnectedTransport === 'function'
+        ? await node.server.getConnectedTransport()
+        : node.server._transport;
+      if (!transport || !transport.isOpen()) {
         node.status({ fill: 'red', shape: 'ring', text: 'Not connected' });
         throw new Error('Modbus Write: Transport not connected');
       }
-
-      const transport = node.server._transport;
 
       node._writing = true;
       node.status({ fill: 'blue', shape: 'dot', text: 'Writing...' });

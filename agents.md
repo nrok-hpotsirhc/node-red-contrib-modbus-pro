@@ -203,11 +203,11 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 
 | Field | Value |
 |-------|-------|
-| Last updated | 2026-04-17 |
-| Test suite | 646 / 646 passing |
+| Last updated | 2026-05-05 |
+| Test suite | 646 / 646 passing; lint passing |
 | Active milestone | MS-10 – Serial Diagnostics & Legacy FCs (next open) |
 | Next open deliverable | WP 6.3 – FC 08 (Diagnostics) + FC 07 (Read Exception Status) |
-| Open items | None – v0.1.0 ready for npm publish |
+| Open items | None – v0.1.0 ready for npm publish; finalization audit complete |
 | Known issues | None |
 | Planned (MS-10–12) | 6 WPs, 10 missing FCs, 4 fieldbus extensions – theoretical foundations (§12–§17) complete |
 
@@ -219,6 +219,7 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 - [x] 81 new tests (unit + integration), 646/646 total passing
 - [x] Node registered in package.json (7 nodes total)
 - [x] Code Review #6 – 4 bugs fixed (parseIntSafe in modbus-write + modbus-discover, FC 23 null guard, 16-bit range validation in buffer-parser)
+- [x] Finalization audit – lint config added, generated TLS cert fixtures stabilized, client transport auto-connect added, status transitions hardened, 646/646 tests passing
 
 ### MS-8 Deliverable Checklist
 - [x] 565/565 tests passing, all security certificate fixtures generated

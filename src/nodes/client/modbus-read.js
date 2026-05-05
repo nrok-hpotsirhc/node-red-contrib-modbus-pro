@@ -72,6 +72,7 @@ module.exports = function (RED) {
 
     // Internal state
     node._pollTimer = null;
+    node._statusTimer = null;
     node._reading = false;
 
     // Validate config node reference
@@ -90,6 +91,19 @@ module.exports = function (RED) {
 
     node.status({ fill: 'grey', shape: 'dot', text: 'Ready' });
 
+    function scheduleStatusReset() {
+      if (node._statusTimer) {
+        clearTimeout(node._statusTimer);
+      }
+      node._statusTimer = setTimeout(function () {
+        node._statusTimer = null;
+        if (!node._reading) {
+          node.status({ fill: 'grey', shape: 'dot', text: 'Ready' });
+        }
+      }, 200);
+      if (node._statusTimer.unref) node._statusTimer.unref();
+    }
+
     /**
      * Perform a single Modbus read operation and return the output message.
      * @param {object} [triggerMsg] - Optional incoming message for trigger-based reads.
@@ -101,12 +115,13 @@ module.exports = function (RED) {
         return null;
       }
 
-      if (!node.server._transport || !node.server._transport.isOpen()) {
+      const transport = typeof node.server.getConnectedTransport === 'function'
+        ? await node.server.getConnectedTransport()
+        : node.server._transport;
+      if (!transport || !transport.isOpen()) {
         node.status({ fill: 'red', shape: 'ring', text: 'Not connected' });
         throw new Error('Modbus Read: Transport not connected');
       }
-
-      const transport = node.server._transport;
       const method = FC_METHOD_MAP[node.fc];
 
       node._reading = true;
@@ -148,6 +163,7 @@ module.exports = function (RED) {
           shape: 'dot',
           text: `OK: ${result.data.length} ${node.fc <= 2 ? 'bits' : 'regs'} @ ${node._protocolAddress}`
         });
+        scheduleStatusReset();
         return msg;
       } finally {
         node._reading = false;
@@ -198,6 +214,10 @@ module.exports = function (RED) {
       if (node._pollTimer) {
         clearInterval(node._pollTimer);
         node._pollTimer = null;
+      }
+      if (node._statusTimer) {
+        clearTimeout(node._statusTimer);
+        node._statusTimer = null;
       }
       node._reading = false;
       done();

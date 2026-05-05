@@ -399,7 +399,7 @@ module.exports = function (RED) {
     node.stopServer = function () {
       return new Promise(function (resolve) {
         // Clear all pending requests
-        for (const [requestId, pending] of node._pendingRequests) {
+        for (const pending of node._pendingRequests.values()) {
           clearTimeout(pending.timer);
           const err = new Error('Server shutting down');
           err.modbusErrorCode = 0x04;

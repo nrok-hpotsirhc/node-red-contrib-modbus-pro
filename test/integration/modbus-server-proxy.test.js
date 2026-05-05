@@ -2,7 +2,6 @@
 
 const helper = require('node-red-node-test-helper');
 const { expect } = require('chai');
-const sinon = require('sinon');
 const ModbusRTU = require('modbus-serial');
 
 const modbusServerConfig = require('../../src/nodes/config/modbus-server-config');
@@ -109,7 +108,6 @@ describe('modbus-server-proxy (integration)', function () {
       helper.load([modbusServerConfig, modbusInNode, modbusOutNode], flow, function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));
@@ -153,7 +151,6 @@ describe('modbus-server-proxy (integration)', function () {
       helper.load([modbusServerConfig, modbusInNode, modbusOutNode], flow, function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));
@@ -350,7 +347,6 @@ describe('modbus-server-proxy (integration)', function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
         const outNode = helper.getNode('out1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));
@@ -394,7 +390,6 @@ describe('modbus-server-proxy (integration)', function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
         const outNode = helper.getNode('out1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));
@@ -436,8 +431,6 @@ describe('modbus-server-proxy (integration)', function () {
       helper.load([modbusServerConfig, modbusInNode, modbusOutNode], flow, function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
-        const outNode = helper.getNode('out1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));
@@ -476,8 +469,6 @@ describe('modbus-server-proxy (integration)', function () {
       helper.load([modbusServerConfig, modbusInNode, modbusOutNode], flow, function () {
         const serverNode = helper.getNode('server1');
         const helperNode = helper.getNode('helper1');
-        const outNode = helper.getNode('out1');
-
         setTimeout(function () {
           if (!serverNode._started) {
             done(new Error('Server did not start'));

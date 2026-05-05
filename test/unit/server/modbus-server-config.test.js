@@ -1,14 +1,11 @@
 'use strict';
 
 const { expect } = require('chai');
-const sinon = require('sinon');
 const helper = require('node-red-node-test-helper');
-const net = require('net');
 const ModbusRTU = require('modbus-serial');
 
 const modbusServerConfig = require('../../../src/nodes/config/modbus-server-config');
 const modbusInNode = require('../../../src/nodes/server/modbus-in');
-const modbusOutNode = require('../../../src/nodes/server/modbus-out');
 
 helper.init(require.resolve('node-red'));
 
