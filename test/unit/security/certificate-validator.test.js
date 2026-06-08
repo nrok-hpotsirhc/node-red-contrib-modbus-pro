@@ -3,7 +3,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const path = require('path');
-const fs = require('fs');
 const { CertificateValidator, DEFAULT_EXPIRY_WARNING_DAYS } = require('../../../src/lib/security/certificate-validator');
 
 const CERTS_DIR = path.join(__dirname, '../../fixtures/certs');

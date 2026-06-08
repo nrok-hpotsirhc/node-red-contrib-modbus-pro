@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 /**
  * node-red-contrib-modbus-pro

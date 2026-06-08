@@ -1,6 +1,6 @@
 'use strict';
 
-const { setup, createActor, assign } = require('xstate');
+const { setup, createActor } = require('xstate');
 const guards = require('./guards');
 const actions = require('./actions');
 

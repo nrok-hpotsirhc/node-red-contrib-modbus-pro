@@ -82,12 +82,13 @@ module.exports = function (RED) {
      * @returns {Promise<void>}
      */
     async function doDiscover(msg, send, done) {
-      if (!node.server._transport || !node.server._transport.isOpen()) {
+      const transport = typeof node.server.getConnectedTransport === 'function'
+        ? await node.server.getConnectedTransport()
+        : node.server._transport;
+      if (!transport || !transport.isOpen()) {
         node.status({ fill: 'red', shape: 'ring', text: 'Not connected' });
         throw new Error('Modbus Discover: Transport not connected');
       }
-
-      const transport = node.server._transport;
 
       // Allow dynamic overrides via msg properties
       const deviceIdCode = (msg.deviceIdCode !== undefined)

@@ -9,6 +9,19 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- **Code review follow-up (2026-05-05):** Removed UTF-8 BOM from `src/index.js` package entry point.
+- **Process lifecycle hardening (2026-05-05):** Added `.unref()` to status-reset timers in `modbus-in`/`modbus-out`, the safety timeout in `modbus-server-config.stopServer()`, and the drain-wait timer in `RtuSemaphore.drain()` so they no longer hold the Node.js event loop open during shutdown.
+- **Finalization audit (2026-05-05):** Restored runnable validation by adding an ESLint configuration and automatic TLS certificate fixture generation before test commands.
+- **Client node lifecycle:** Added on-demand connected transport creation for read, write, and discover nodes so deployed flows can establish connections without manually seeding `_transport`.
+- **Node status transitions:** Added status reset cleanup for `modbus-read` success states and all `modbus-out` validation error paths.
+- **Transport error safety:** Guarded transport `error` event emission when no listeners are registered to avoid unhandled EventEmitter crashes during connection failures.
+- **Editor UI helpers:** Fixed address hint parsing to preserve valid zero addresses and avoid `parseInt(x) || 0` edge cases.
+
+### Changed
+- **Certificate fixtures:** `test/fixtures/certs/generate-certs.js` now prefers OpenSSL generation with a pure-JS fallback, making TLS tests deterministic while keeping generated PEM files out of source control.
+- **Validation:** `npm run lint` now runs cleanly, `npm test` regenerates required cert fixtures automatically, and `npm pack --dry-run` validates the package contents.
+
 ---
 
 ## [0.1.0] – 2026-04-17

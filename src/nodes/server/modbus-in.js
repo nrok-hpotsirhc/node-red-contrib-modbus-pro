@@ -117,6 +117,7 @@ module.exports = function (RED) {
           node.status({ fill: 'green', shape: 'dot', text: 'Listening' });
         }
       }, 200);
+      if (timer.unref) timer.unref();
       node._statusTimers.push(timer);
     }
 

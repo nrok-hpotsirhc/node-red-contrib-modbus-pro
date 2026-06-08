@@ -37,7 +37,10 @@
             function updateAddressHint() {
                 var fc = parseInt(fcSelect.val(), 10);
                 var offset = addressOffsetSelect.val();
-                var addr = parseInt(addressInput.val(), 10) || 0;
+                var addr = parseInt(addressInput.val(), 10);
+                if (!Number.isFinite(addr)) {
+                    addr = 0;
+                }
 
                 var protocolAddr = (offset === 'one-based') ? Math.max(0, addr - 1) : addr;
 

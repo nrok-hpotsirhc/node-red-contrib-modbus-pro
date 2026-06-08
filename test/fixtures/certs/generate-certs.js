@@ -8,10 +8,106 @@
  */
 
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const CERTS_DIR = path.join(__dirname);
+
+function runOpenSsl(args, options = {}) {
+  execFileSync('openssl', args, {
+    stdio: options.stdio || 'ignore',
+    cwd: options.cwd || CERTS_DIR
+  });
+}
+
+function generateWithOpenSsl() {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'modbus-pro-certs-'));
+  try {
+    const serverExt = path.join(tmpDir, 'server-ext.cnf');
+    const serverCsr = path.join(tmpDir, 'server.csr');
+    const clientCsr = path.join(tmpDir, 'client.csr');
+    fs.writeFileSync(serverExt, [
+      '[v3_req]',
+      'basicConstraints=CA:FALSE',
+      'keyUsage=digitalSignature,keyEncipherment',
+      'extendedKeyUsage=serverAuth',
+      'subjectAltName=DNS:localhost,IP:127.0.0.1',
+      ''
+    ].join('\n'));
+
+    for (const file of fs.readdirSync(CERTS_DIR)) {
+      if (file.endsWith('.pem')) {
+        fs.unlinkSync(path.join(CERTS_DIR, file));
+      }
+    }
+
+    runOpenSsl(['genrsa', '-out', 'ca-key.pem', '2048']);
+    runOpenSsl([
+      'req', '-x509', '-new', '-key', 'ca-key.pem', '-sha256', '-days', '3650',
+      '-subj', '/CN=TestCA/O=TestOrg/C=DE', '-out', 'ca-cert.pem'
+    ]);
+
+    runOpenSsl(['genrsa', '-out', 'server-key.pem', '2048']);
+    runOpenSsl(['req', '-new', '-key', 'server-key.pem', '-subj', '/CN=localhost', '-out', serverCsr]);
+    runOpenSsl([
+      'x509', '-req', '-in', serverCsr, '-CA', 'ca-cert.pem', '-CAkey', 'ca-key.pem',
+      '-set_serial', '0x02', '-out', 'server-cert.pem', '-days', '1825', '-sha256',
+      '-extfile', serverExt, '-extensions', 'v3_req'
+    ]);
+
+    runOpenSsl(['genrsa', '-out', 'client-key.pem', '2048']);
+    runOpenSsl(['req', '-new', '-key', 'client-key.pem', '-subj', '/CN=TestClient/OU=ModbusOperator', '-out', clientCsr]);
+    runOpenSsl([
+      'x509', '-req', '-in', clientCsr, '-CA', 'ca-cert.pem', '-CAkey', 'ca-key.pem',
+      '-set_serial', '0x03', '-out', 'client-cert.pem', '-days', '1825', '-sha256'
+    ]);
+    runOpenSsl([
+      'pkcs8', '-topk8', '-in', 'client-key.pem', '-out', 'client-key-encrypted.pem',
+      '-v2', 'aes-256-cbc', '-passout', 'pass:testpass123'
+    ]);
+
+    runOpenSsl(['genrsa', '-out', 'untrusted-key.pem', '2048']);
+    runOpenSsl([
+      'req', '-x509', '-new', '-key', 'untrusted-key.pem', '-sha256', '-days', '1825',
+      '-subj', '/CN=untrusted', '-out', 'untrusted-cert.pem'
+    ]);
+
+    runOpenSsl(['genrsa', '-out', 'expired-key.pem', '2048']);
+    runOpenSsl([
+      'req', '-x509', '-new', '-key', 'expired-key.pem', '-sha256', '-days', '1',
+      '-subj', '/CN=expired', '-out', 'expired-cert.pem'
+    ]);
+
+    return true;
+  } catch (_err) {
+    return false;
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+}
+
+if (generateWithOpenSsl()) {
+  console.log('Generating test certificates in:', CERTS_DIR);
+  [
+    'ca-key.pem',
+    'ca-cert.pem',
+    'server-key.pem',
+    'server-cert.pem',
+    'client-key.pem',
+    'client-cert.pem',
+    'client-key-encrypted.pem',
+    'untrusted-cert.pem',
+    'untrusted-key.pem',
+    'expired-cert.pem',
+    'expired-key.pem'
+  ].forEach(function (file) {
+    console.log('  ' + file);
+  });
+  console.log('\nAll test certificates generated successfully!');
+  process.exit(0);
+}
 
 function generateKeyPair() {
   return crypto.generateKeyPairSync('rsa', {
@@ -21,40 +117,12 @@ function generateKeyPair() {
   });
 }
 
-function generateSelfSignedCert(subject, keyPair, options = {}) {
-  // Use Node.js X509Certificate generation via crypto.createCertificate (Node 20+)
-  // Fallback: use child_process with node -e for older versions
-  const { privateKey, publicKey } = keyPair;
-  const days = options.days || 3650;
-  const extensions = options.extensions || [];
-  const issuerKey = options.issuerKey || privateKey;
-  const issuerSubject = options.issuerSubject || subject;
-
-  // We need to use the forge-like approach or spawn openssl
-  // Since openssl is not available, we use a pure JS approach via ASN1 construction
-  // Actually, Node.js 20+ doesn't have built-in cert generation.
-  // We'll use the 'selfsigned' approach via crypto.sign
-
-  // Let's use a simpler approach - create certificates using the X509 API indirectly
-  // by creating CSR and signing
-  return null; // placeholder
-}
-
 // Since Node.js doesn't have built-in X509 cert generation without OpenSSL,
 // we'll generate certs using a small inline DER/ASN1 builder
 
 const forge = (() => {
   // Minimal ASN1/DER certificate builder
   // This creates valid X.509v3 certificates using only Node.js crypto
-
-  function intToBytes(n, len) {
-    const buf = Buffer.alloc(len);
-    for (let i = len - 1; i >= 0; i--) {
-      buf[i] = n & 0xff;
-      n >>= 8;
-    }
-    return buf;
-  }
 
   function derLength(len) {
     if (len < 0x80) return Buffer.from([len]);

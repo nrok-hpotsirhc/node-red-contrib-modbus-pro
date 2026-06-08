@@ -46,9 +46,14 @@
     "CHANGELOG.md"
   ],
   "scripts": {
+    "generate:certs": "node test/fixtures/certs/generate-certs.js",
+    "pretest": "npm run generate:certs",
     "test": "mocha --config .mocharc.yml",
+    "pretest:unit": "npm run generate:certs",
     "test:unit": "mocha --config .mocharc.yml test/unit/**/*.test.js",
+    "pretest:integration": "npm run generate:certs",
     "test:integration": "mocha --config .mocharc.yml --timeout 10000 test/integration/**/*.test.js",
+    "pretest:coverage": "npm run generate:certs",
     "test:coverage": "nyc --reporter=text --reporter=html mocha --config .mocharc.yml",
     "lint": "eslint src/ test/",
     "lint:fix": "eslint src/ test/ --fix",

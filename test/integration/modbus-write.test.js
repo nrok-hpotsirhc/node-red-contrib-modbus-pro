@@ -537,7 +537,7 @@ describe('modbus-write (integration)', function () {
 
       simulateConnectedTransport(configNode);
 
-      helperNode.on('input', function (msg) {
+      helperNode.on('input', function (_msg) {
         outputCount++;
         if (outputCount === 3) {
           done();

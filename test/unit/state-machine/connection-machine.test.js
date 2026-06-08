@@ -2,7 +2,7 @@
 
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { connectionMachine, createConnectionActor, DEFAULT_CONTEXT } = require('../../../src/lib/state-machine/connection-machine');
+const { createConnectionActor, DEFAULT_CONTEXT } = require('../../../src/lib/state-machine/connection-machine');
 
 describe('Connection State Machine', function () {
   let actor;

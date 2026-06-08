@@ -5,14 +5,14 @@
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Node-RED](https://img.shields.io/badge/Platform-Node--RED-red.svg)](https://nodered.org)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org)
-[![Status](https://img.shields.io/badge/Status-MS--8%20In%20Progress-orange.svg)](#development-progress)
-[![Tests](https://img.shields.io/badge/Tests-565%20passing-brightgreen.svg)](#development-progress)
+[![Status](https://img.shields.io/badge/Status-MS--9%20Complete-brightgreen.svg)](#development-progress)
+[![Tests](https://img.shields.io/badge/Tests-646%20passing-brightgreen.svg)](#development-progress)
 
 ---
 
 ## Development Progress
 
-> **Current State (2026-04-17):** v0.1.0 released – all 11 function codes (FC 01–06, 15, 16, 22, 23, 43/14) implemented and tested. 646/646 tests passing. 7 Node-RED nodes. MS-8 (QA & Release) and MS-9 (Extended FCs) complete.
+> **Current State (2026-05-05):** v0.1.0 released and finalization audit complete – all 11 implemented function codes (FC 01–06, 15, 16, 22, 23, 43/14) are validated. 646/646 tests passing, lint passing, 7 Node-RED nodes. MS-8 (QA & Release) and MS-9 (Extended FCs) complete.
 
 | # | Milestone | Status | Progress |
 |---|-----------|--------|----------|
@@ -44,7 +44,7 @@
 - **Backpressure Management** – configurable queue limits with FIFO/LIFO drop strategies
 - **Dynamic Server Proxying** – event-based processing without monolithic memory arrays
 - **Modbus/TCP Security (MBTPS)** – TLS 1.3, mTLS via X.509v3, port 802
-- **Full Function Code Support** – FC 01-06, 15, 16 and diagnostics
+- **Implemented Function Codes** – FC 01-06, 15, 16, 22, 23, and 43/14; diagnostics are planned for MS-10
 
 ## Architecture Principles
 

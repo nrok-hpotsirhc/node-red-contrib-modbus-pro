@@ -249,8 +249,6 @@ describe('lifecycle – partial deploy leak tests (WP 5.2)', function () {
         const readNode = helper.getNode('read1');
         expect(readNode._pollTimer).to.not.be.null;
 
-        // Track timer nullification via a close listener
-        const origClose = readNode._closeCallbacks;
         let timerWasNulled = false;
 
         // Add a listener that fires after close handler

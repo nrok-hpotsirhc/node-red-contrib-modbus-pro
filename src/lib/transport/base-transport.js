@@ -49,7 +49,7 @@ class BaseTransport extends EventEmitter {
     this._connected = false;
 
     this._client.on('close', () => this._handleDisconnect());
-    this._client.on('error', (err) => this.emit('error', err));
+    this._client.on('error', (err) => this._emitError(err));
   }
 
   /**
@@ -272,7 +272,7 @@ class BaseTransport extends EventEmitter {
         });
       });
     } catch (err) {
-      this.emit('error', err);
+      this._emitError(err);
       throw err;
     } finally {
       this._handleDisconnect();
@@ -314,6 +314,17 @@ class BaseTransport extends EventEmitter {
     if (this._connected) {
       this._connected = false;
       this.emit('disconnect');
+    }
+  }
+
+  /**
+   * Emit an error only when consumers are listening.
+   * @param {Error} err
+   * @private
+   */
+  _emitError(err) {
+    if (this.listenerCount('error') > 0) {
+      this.emit('error', err);
     }
   }
 

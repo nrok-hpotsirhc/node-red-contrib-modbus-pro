@@ -486,7 +486,7 @@ describe('TlsWrapper', function () {
       this.timeout(15000);
       // Create a server that accepts but never completes TLS handshake
       const net = require('net');
-      const fakeServer = net.createServer(function (socket) {
+      const fakeServer = net.createServer(function () {
         // Don't send anything – let it hang
       });
 
