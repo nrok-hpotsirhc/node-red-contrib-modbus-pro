@@ -9,8 +9,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- **COM11 slave-4 FC23 smoke test (2026-06-08):** Added `test/integration/rtu-com11-smoke.test.js` and `npm run test:rtu-com11` for opt-in RTU validation against COM11, 19200 baud, 8E1, unit ID 4. The test uses FC23 to read holding registers 1-2 while writing holding registers 3-4, then verifies registers 3-4 separately. It defaults to a write-back of current values unless `RTU_WRITE_VALUES` is set.
+
 ### Fixed
-- **RTU live hardware test (2026-06-08):** Added opt-in gating via `RTU_LIVE_TESTS=true`, updated the PowerShell/COM11 usage path, and fixed the connection smoke test to use the existing `getID()` transport API. Verified COM11 access with 3/3 passing live connection tests.
+- **RTU live hardware test (2026-06-08):** Added opt-in gating via `RTU_LIVE_TESTS=true`, added the PowerShell-safe `test:rtu-live` script, updated the COM11 usage path, and fixed the connection smoke test to use the existing `getID()` transport API. Verified COM11 access with 3/3 passing live connection tests.
 - **Code review follow-up (2026-05-05):** Removed UTF-8 BOM from `src/index.js` package entry point.
 - **Process lifecycle hardening (2026-05-05):** Added `.unref()` to status-reset timers in `modbus-in`/`modbus-out`, the safety timeout in `modbus-server-config.stopServer()`, and the drain-wait timer in `RtuSemaphore.drain()` so they no longer hold the Node.js event loop open during shutdown.
 - **Finalization audit (2026-05-05):** Restored runnable validation by adding an ESLint configuration and automatic TLS certificate fixture generation before test commands.

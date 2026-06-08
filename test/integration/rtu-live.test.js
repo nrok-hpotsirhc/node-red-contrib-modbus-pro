@@ -40,10 +40,10 @@ describe('RtuTransport - Live Hardware Tests', function () {
   // Read configuration from environment variables.
   const liveConfig = {
     serialPort: process.env.RTU_PORT || 'COM11',
-    baudRate: parseInt(process.env.RTU_BAUDRATE || '9600', 10),
+    baudRate: parseInt(process.env.RTU_BAUDRATE || '19200', 10),
     dataBits: parseInt(process.env.RTU_DATABITS || '8', 10),
     stopBits: parseInt(process.env.RTU_STOPBITS || '1', 10),
-    parity: process.env.RTU_PARITY || 'none',
+    parity: process.env.RTU_PARITY || 'even',
     unitId: parseInt(process.env.RTU_UNITID || '1', 10),
     timeout: 5000
   };
