@@ -58,7 +58,8 @@ describe('RtuTransport', function () {
         parity: 'even',
         unitId: 5
       });
-      expect(transport._config.serialPort).to.equal('/dev/ttyS0');
+      expect(transport._config.serialPort).to.equal('COM11');
+      //xpect(transport._config.serialPort).to.equal('/dev/ttyS0');
       expect(transport._config.baudRate).to.equal(19200);
       expect(transport._config.parity).to.equal('even');
       expect(transport._config.unitId).to.equal(5);

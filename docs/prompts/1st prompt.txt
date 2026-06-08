@@ -11,3 +11,4 @@ auch alles was getestet wird soll erklärt werden und stetig weitergepflegt werd
 vermerke auch im agents file und der test doku, dass jegliche art von mock- oder testdaten sichtbar dokumentiert werden müssen um sie schnell finden und einfach entfernen zu können
 schlage mir einen guten namen für das repo vor
 stelle sicher, dass es keine rechtlichen probleme gibt durch infos oder recherchen ? könnte es plagiat vorwürfe geben? ich möchte dass du das projekt, mit den recherche daten und den veröffentlichen projektdaten und sourcen vergleichst! es darf keine lizenzrechtlichen probleme geben und der code darf nicht kopiert sein.
+Erstelle mir ausserdem einen docs/prompts ordner in dem diese prompt aber auch weitere hilfreiche prompts liegen um dieses projekt umzusetzen.
