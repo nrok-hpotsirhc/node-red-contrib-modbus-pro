@@ -12,7 +12,7 @@
 
 ## Development Progress
 
-> **Current State (2026-05-05):** v0.1.0 released and finalization audit complete – all 11 implemented function codes (FC 01–06, 15, 16, 22, 23, 43/14) are validated. 646/646 tests passing, lint passing, 7 Node-RED nodes. MS-8 (QA & Release) and MS-9 (Extended FCs) complete.
+> **Current State (2026-06-08):** v0.1.0 released and finalization audit complete – all 11 implemented function codes (FC 01–06, 15, 16, 22, 23, 43/14) are validated. 646/646 automated tests passing, lint passing, and an opt-in COM11 live connection smoke test verified separately (3/3 passing). 7 Node-RED nodes. MS-8 (QA & Release) and MS-9 (Extended FCs) complete.
 
 | # | Milestone | Status | Progress |
 |---|-----------|--------|----------|
@@ -29,7 +29,7 @@
 | MS-11 | Fieldbus Architecture Extensions | 🔲 Open | `░░░░░░░░░░` 0 % |
 | MS-12 | Advanced Fieldbus Nodes | 🔲 Open | `░░░░░░░░░░` 0 % |
 
-**Overall Progress: 9 / 12 milestones completed – 646 / 646 tests passing**
+**Overall Progress: 9 / 12 milestones completed – 646 / 646 automated tests passing; opt-in COM11 live smoke test 3 / 3 passing**
 
 > Milestone details: [MILESTONES.md](MILESTONES.md) · Work packages: [docs/WORK_PACKAGES.md](docs/WORK_PACKAGES.md)
 

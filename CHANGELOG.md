@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- **RTU live hardware test (2026-06-08):** Added opt-in gating via `RTU_LIVE_TESTS=true`, updated the PowerShell/COM11 usage path, and fixed the connection smoke test to use the existing `getID()` transport API. Verified COM11 access with 3/3 passing live connection tests.
 - **Code review follow-up (2026-05-05):** Removed UTF-8 BOM from `src/index.js` package entry point.
 - **Process lifecycle hardening (2026-05-05):** Added `.unref()` to status-reset timers in `modbus-in`/`modbus-out`, the safety timeout in `modbus-server-config.stopServer()`, and the drain-wait timer in `RtuSemaphore.drain()` so they no longer hold the Node.js event loop open during shutdown.
 - **Finalization audit (2026-05-05):** Restored runnable validation by adding an ESLint configuration and automatic TLS certificate fixture generation before test commands.

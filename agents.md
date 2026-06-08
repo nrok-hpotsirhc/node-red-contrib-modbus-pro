@@ -203,8 +203,8 @@ The complete document is at [docs/THEORETICAL_FOUNDATIONS.md](docs/THEORETICAL_F
 
 | Field | Value |
 |-------|-------|
-| Last updated | 2026-05-05 |
-| Test suite | 646 / 646 passing; lint passing |
+| Last updated | 2026-06-08 |
+| Test suite | 646 / 646 passing; lint passing; COM11 live connection smoke test 3 / 3 passing (opt-in) |
 | Active milestone | MS-10 – Serial Diagnostics & Legacy FCs (next open) |
 | Next open deliverable | WP 6.3 – FC 08 (Diagnostics) + FC 07 (Read Exception Status) |
 | Open items | None – v0.1.0 ready for npm publish; finalization audit + post-audit cleanup complete |
